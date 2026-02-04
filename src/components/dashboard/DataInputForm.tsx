@@ -9,9 +9,10 @@ interface DataInputFormProps {
   initialData?: FinancialData | null
   onSave: (data: Partial<FinancialData>) => Promise<void>
   disabled?: boolean
+  importedData?: any // Ajouté pour l'import automatique
 }
 
-export function DataInputForm({ initialData, onSave, disabled }: DataInputFormProps) {
+export function DataInputForm({ initialData, onSave, disabled, importedData }: DataInputFormProps) {
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     rent: 0,
@@ -23,6 +24,22 @@ export function DataInputForm({ initialData, onSave, disabled }: DataInputFormPr
     variable_cost_rate: 0,
     revenue: 0,
   })
+
+  // Remplissage auto si importedData change
+  useEffect(() => {
+    if (importedData) {
+      setFormData({
+        rent: importedData.rent ?? formData.rent,
+        salaries: importedData.salary ?? formData.salaries,
+        insurance: importedData.insurance ?? formData.insurance,
+        subscriptions: importedData.subscriptions ?? formData.subscriptions,
+        loan_payments: importedData.loans ?? formData.loan_payments,
+        other: importedData.other_expenses ?? formData.other,
+        variable_cost_rate: importedData.variable_cost_rate ?? formData.variable_cost_rate,
+        revenue: importedData.revenue ?? formData.revenue,
+      })
+    }
+  }, [importedData])
 
   useEffect(() => {
     if (initialData) {

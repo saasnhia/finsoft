@@ -11,15 +11,21 @@
   "dependencies": {
     "@supabase/ssr": "^0.5.1",
     "@supabase/supabase-js": "^2.45.4",
+    "@types/pdf-parse": "^1.1.5",
     "framer-motion": "^11.11.17",
     "lucide-react": "^0.460.0",
     "next": "^16.1.6",
+    "papaparse": "^5.5.3",
+    "pdf2json": "^4.0.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "recharts": "^2.13.3"
+    "react-hot-toast": "^2.6.0",
+    "recharts": "^2.13.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/node": "^22.9.0",
+    "@types/papaparse": "^5.5.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.4.20",

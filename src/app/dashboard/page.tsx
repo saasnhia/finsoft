@@ -21,6 +21,8 @@ import {
   ArrowDownRight,
   Loader2,
 } from 'lucide-react'
+import React, { useRef, useState } from 'react'
+import { toast } from 'react-hot-toast'
 
 export default function DashboardPage() {
   const { user, loading: authLoading } = useAuth()
@@ -30,6 +32,10 @@ export default function DashboardPage() {
     loading: dataLoading, 
     saveData 
   } = useFinancialData(user?.id)
+
+  const [parsedData, setParsedData] = useState<ParsedFields | null>(null)
+  const [importLoading, setImportLoading] = useState(false)
+  const [importedData, setImportedData] = useState<any>(null)
 
   const kpis = useMemo(() => {
     if (!currentData) return null
@@ -42,6 +48,46 @@ export default function DashboardPage() {
   }, [history])
 
   const loading = authLoading || dataLoading
+
+  const ALL_FIELDS = [
+    'chiffreAffaires',
+    'loyer',
+    'salaires',
+    'assurances',
+    'abonnements',
+    'emprunts',
+    'autres',
+    'tauxChargesVariables',
+  ]
+
+  const missingFields = React.useMemo(() => {
+    if (!parsedData) return ALL_FIELDS
+    return ALL_FIELDS.filter(f => !parsedData.detectedFields?.includes(f))
+  }, [parsedData])
+
+  function handleParsedData(data: any) {
+    if (data === 'loading') {
+      setImportLoading(true)
+      setParsedData(null)
+    } else {
+      setImportLoading(false)
+      setParsedData(data)
+    }
+  }
+
+  function handleValidateImport(data: ParsedFields) {
+    setImportedData({
+      revenue: data.chiffreAffaires || 0,
+      rent: data.loyer || 0,
+      salary: data.salaires || 0,
+      insurance: data.assurances || 0,
+      subscriptions: data.abonnements || 0,
+      loans: data.emprunts || 0,
+      other_expenses: data.autres || 0,
+      variable_cost_rate: data.tauxChargesVariables || 0,
+    })
+    toast.success('Champs remplis automatiquement !')
+  }
 
   if (loading) {
     return (
@@ -175,13 +221,22 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Data Input Form */}
+        {/* Data Input Form + Import */}
         <div className="mt-8 grid lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-8">
+            {/* Import Fichier Comptable */}
+            <div className="mb-6 p-6 bg-white border border-navy-100 rounded-xl shadow-sm">
+              <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
+                <span role="img" aria-label="import">📁</span> Importer fichier comptable
+              </h2>
+              <p className="text-navy-500 mb-4 text-sm">PDF, Excel (.xlsx), ou CSV. Les champs détectés seront remplis automatiquement.</p>
+              <FileImportZone onParsed={handleParsedData} loading={importLoading} parsedData={parsedData} missingFields={missingFields} onValidate={handleValidateImport} />
+            </div>
             <DataInputForm
               initialData={currentData}
               onSave={saveData}
               disabled={!user}
+              importedData={importedData}
             />
           </div>
 
@@ -264,6 +319,123 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
+    </div>
+  )
+}
+
+// --- Types et constantes globales ---
+type ParsedFields = {
+  chiffreAffaires?: number
+  loyer?: number
+  salaires?: number
+  assurances?: number
+  abonnements?: number
+  emprunts?: number
+  autres?: number
+  tauxChargesVariables?: number
+  detectedFields?: string[]
+}
+
+const FIELD_LABELS: Record<string, string> = {
+  chiffreAffaires: "Chiffre d'affaires",
+  loyer: 'Loyer',
+  salaires: 'Salaires',
+  assurances: 'Assurances',
+  abonnements: 'Abonnements',
+  emprunts: 'Emprunts',
+  autres: 'Autres charges',
+  tauxChargesVariables: 'Taux charges variables',
+}
+
+function FileImportZone({ onParsed, loading, parsedData, missingFields, onValidate }: any) {
+  const inputRef = React.useRef<HTMLInputElement>(null)
+  const [dragActive, setDragActive] = React.useState(false)
+  const [fileName, setFileName] = React.useState<string | null>(null)
+
+  const handleFile = async (file: File) => {
+    setFileName(file.name)
+    onParsed(null)
+    const formData = new FormData()
+    formData.append('file', file)
+    try {
+      onParsed('loading')
+      const res = await fetch('/api/parse-finance', { method: 'POST', body: formData })
+      const data = await res.json()
+      if (res.ok) {
+        onParsed(data)
+      } else {
+        toast.error(data.error || 'Erreur lors du parsing du fichier')
+        onParsed(null)
+      }
+    } catch (e) {
+      toast.error('Erreur lors du parsing du fichier')
+      onParsed(null)
+    }
+  }
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragActive(false)
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0])
+    }
+  }
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      handleFile(e.target.files[0])
+    }
+  }
+
+  return (
+    <div>
+      <div
+        className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${dragActive ? 'border-emerald-500 bg-emerald-50' : 'border-navy-200 bg-navy-50'}`}
+        onDragOver={e => { e.preventDefault(); setDragActive(true) }}
+        onDragLeave={e => { e.preventDefault(); setDragActive(false) }}
+        onDrop={onDrop}
+        onClick={() => inputRef.current?.click()}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".pdf,.xlsx,.xls,.csv"
+          className="hidden"
+          onChange={onChange}
+        />
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-2xl">⬇️</span>
+          <span className="font-medium">Glissez-déposez ou cliquez pour importer</span>
+          {fileName && <span className="text-xs text-navy-400">{fileName}</span>}
+        </div>
+      </div>
+      {/* Résultats détectés */}
+      <div className="mt-4">
+        {loading === 'loading' && (
+          <div className="flex items-center gap-2 text-emerald-600"><Loader2 className="animate-spin w-5 h-5" /> Analyse du fichier...</div>
+        )}
+        {parsedData && loading !== 'loading' && (
+          <div className="space-y-2">
+            <div className="text-emerald-700 font-semibold flex items-center gap-2">
+              ✅ Détecté :
+              {parsedData.detectedFields && parsedData.detectedFields.length > 0 ? (
+                <span>
+                  {parsedData.detectedFields.map((f: string) => `${FIELD_LABELS[f] || f}: ${parsedData[f]}€`).join(', ')}
+                </span>
+              ) : (
+                <span>Aucun champ détecté</span>
+              )}
+            </div>
+            {missingFields && missingFields.length > 0 && (
+              <div className="text-coral-700 text-sm">Champs manquants : {missingFields.map((f: string) => FIELD_LABELS[f] || f).join(', ')}</div>
+            )}
+            <button
+              className="mt-2 px-4 py-2 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors disabled:opacity-50"
+              onClick={() => onValidate(parsedData)}
+              disabled={missingFields && missingFields.length > 0}
+            >Valider et Remplir</button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
