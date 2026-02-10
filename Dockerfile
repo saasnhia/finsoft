@@ -1,0 +1,39 @@
+# ============================================================
+# FinPilote Enterprise — Multi-stage Docker Build
+# ============================================================
+
+# Stage 1: Install dependencies
+FROM node:20-slim AS deps
+RUN apt-get update && apt-get install -y \
+    libc6 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Stage 2: Production runner (build is done on host via "npm run build")
+FROM node:20-slim AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN groupadd --system --gid 1001 nodejs
+RUN useradd --system --uid 1001 --gid nodejs nextjs
+
+# Copy pre-built standalone output from host
+COPY --chown=nextjs:nodejs .next/standalone ./
+COPY --chown=nextjs:nodejs .next/static ./.next/static
+COPY public ./public
+
+# Copy Supabase migrations for db:migrate script
+COPY supabase ./supabase
+
+USER nextjs
+
+EXPOSE 3000
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]

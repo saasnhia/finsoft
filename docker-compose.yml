@@ -1,0 +1,146 @@
+# ============================================================
+# FinPilote Enterprise On-Premise — Docker Compose
+# ============================================================
+# Usage:
+#   docker-compose up -d
+#   Access: http://localhost:3000
+# ============================================================
+
+services:
+  # ── PostgreSQL (Supabase-compatible) ──────────────────────
+  postgres:
+    image: supabase/postgres:15.6.1.143
+    restart: unless-stopped
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-finpilote}
+      POSTGRES_USER: ${POSTGRES_USER:-finpilote}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finpilote} -d ${POSTGRES_DB:-finpilote}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── PostgREST (REST API for Supabase client) ─────────────
+  postgrest:
+    image: postgrest/postgrest:v12.2.3
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://${POSTGRES_USER:-finpilote}:${DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-finpilote}
+      PGRST_DB_SCHEMAS: public,storage
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: "false"
+
+  # ── GoTrue (Auth service) ────────────────────────────────
+  gotrue:
+    image: supabase/gotrue:v2.158.1
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      GOTRUE_API_HOST: 0.0.0.0
+      GOTRUE_API_PORT: 9999
+      API_EXTERNAL_URL: ${API_EXTERNAL_URL:-http://localhost:8000}
+      GOTRUE_DB_DRIVER: postgres
+      GOTRUE_DB_DATABASE_URL: postgres://${POSTGRES_USER:-finpilote}:${DB_PASSWORD}@postgres:5432/${POSTGRES_DB:-finpilote}?search_path=auth
+      GOTRUE_SITE_URL: ${SITE_URL:-http://localhost:3000}
+      GOTRUE_URI_ALLOW_LIST: ${ADDITIONAL_REDIRECT_URLS:-}
+      GOTRUE_DISABLE_SIGNUP: ${DISABLE_SIGNUP:-false}
+      GOTRUE_JWT_ADMIN_ROLES: service_role
+      GOTRUE_JWT_AUD: authenticated
+      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
+      GOTRUE_JWT_EXP: ${JWT_EXPIRY:-3600}
+      GOTRUE_JWT_SECRET: ${JWT_SECRET}
+      GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP:-true}
+      GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM:-true}
+      GOTRUE_SMTP_HOST: ${SMTP_HOST:-}
+      GOTRUE_SMTP_PORT: ${SMTP_PORT:-587}
+      GOTRUE_SMTP_USER: ${SMTP_USER:-}
+      GOTRUE_SMTP_PASS: ${SMTP_PASS:-}
+      GOTRUE_SMTP_ADMIN_EMAIL: ${SMTP_ADMIN_EMAIL:-admin@finpilote.local}
+      GOTRUE_MAILER_URLPATHS_INVITE: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_CONFIRMATION: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_RECOVERY: /auth/v1/verify
+      GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE: /auth/v1/verify
+
+  # ── Kong (API Gateway) ──────────────────────────────────
+  kong:
+    image: kong:3.7
+    restart: unless-stopped
+    ports:
+      - "${KONG_PORT:-8000}:8000"
+    depends_on:
+      - postgrest
+      - gotrue
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
+      KONG_DNS_ORDER: LAST,A,CNAME
+      KONG_PLUGINS: request-transformer,cors,key-auth,acl
+      KONG_NGINX_PROXY_PROXY_BUFFER_SIZE: 160k
+      KONG_NGINX_PROXY_PROXY_BUFFERS: 64 160k
+    volumes:
+      - ./docker/kong.yml:/etc/kong/kong.yml:ro
+
+  # ── Ollama (Local AI / LLM) ─────────────────────────────
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "${OLLAMA_PORT:-11434}:11434"
+    volumes:
+      - ./data/ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          memory: 8G
+
+  # ── FinPilote App (Next.js) ─────────────────────────────
+  finpilote-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kong:
+        condition: service_started
+      ollama:
+        condition: service_started
+    environment:
+      # Supabase — points to self-hosted Kong gateway
+      NEXT_PUBLIC_SUPABASE_URL: http://kong:8000
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${ANON_KEY:?ANON_KEY is required}
+      SUPABASE_SERVICE_ROLE_KEY: ${SERVICE_ROLE_KEY:-}
+      # Local AI
+      OLLAMA_HOST: http://ollama:11434
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-mistral:7b-instruct-q5_K_M}
+      # Email (SMTP for on-premise)
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_FROM: ${SMTP_FROM:-noreply@finpilote.local}
+      # Security
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+      CRON_SECRET: ${CRON_SECRET:-}
+      # Optional cloud fallbacks (leave empty for full on-premise)
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+
+volumes:
+  postgres_data:
+  ollama_data:

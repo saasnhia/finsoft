@@ -1,0 +1,56 @@
+_format_version: "2.1"
+_transform: true
+
+# ============================================================
+# Kong API Gateway — Routes for self-hosted Supabase
+# ============================================================
+
+services:
+  # PostgREST — Database REST API
+  - name: postgrest
+    host: postgrest
+    port: 3000
+    protocol: http
+    routes:
+      - name: postgrest-all
+        strip_path: true
+        paths:
+          - /rest/v1/
+    plugins:
+      - name: cors
+
+  # GoTrue — Authentication
+  - name: gotrue
+    host: gotrue
+    port: 9999
+    protocol: http
+    routes:
+      - name: gotrue-all
+        strip_path: true
+        paths:
+          - /auth/v1/
+    plugins:
+      - name: cors
+
+plugins:
+  - name: cors
+    config:
+      origins:
+        - "*"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Authorization
+        - Content-Type
+        - apikey
+        - X-Client-Info
+      exposed_headers:
+        - Content-Range
+      credentials: true
+      max_age: 3600
