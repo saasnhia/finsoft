@@ -332,7 +332,7 @@ export default function HomePage() {
             </div>
 
             <blockquote className="text-center italic text-gray-700 max-w-2xl mx-auto">
-              &ldquo;Excellent pour automatiser OCR + SIREN en cabinet comptable.&rdquo;
+              &ldquo;Adieu saisie manuelle ! OCR + SIREN en 30s.&rdquo;
               <cite className="block mt-2 text-sm font-medium text-gray-500 not-italic">
                 &mdash; Enseignants IAE Dijon
               </cite>
