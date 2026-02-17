@@ -44,21 +44,26 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="font-display font-semibold text-white mb-4">Support</h4>
+            <h4 className="font-display font-semibold text-white mb-4">Légal</h4>
             <ul className="space-y-2">
               <li>
-                <a href="mailto:support@finsoft.fr" className="text-sm hover:text-emerald-400 transition-colors">
+                <a href="mailto:saasnhia@gmail.com" className="text-sm hover:text-emerald-400 transition-colors">
                   Contact
                 </a>
               </li>
               <li>
-                <Link href="#" className="text-sm hover:text-emerald-400 transition-colors">
-                  Documentation
+                <Link href="/mentions-legales" className="text-sm hover:text-emerald-400 transition-colors">
+                  Mentions légales
                 </Link>
               </li>
               <li>
-                <Link href="#" className="text-sm hover:text-emerald-400 transition-colors">
-                  Mentions légales
+                <Link href="/cgv" className="text-sm hover:text-emerald-400 transition-colors">
+                  CGV
+                </Link>
+              </li>
+              <li>
+                <Link href="/confidentialite" className="text-sm hover:text-emerald-400 transition-colors">
+                  Confidentialité (RGPD)
                 </Link>
               </li>
             </ul>

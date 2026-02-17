@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Link from 'next/link'
 import { Button, Card } from '@/components/ui'
 import { Header, Footer } from '@/components/layout'
 import {
@@ -60,18 +59,20 @@ export default function HomePage() {
               </p>
 
               <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center animate-slide-up stagger-2">
-                <Link href="/signup">
-                  <Button size="lg" icon={<ArrowRight className="w-5 h-5" />}>
-                    D&eacute;marrer gratuitement
-                  </Button>
-                </Link>
-                <button
+                <Button
+                  size="lg"
+                  icon={<Calendar className="w-5 h-5" />}
                   onClick={() => setShowContact(true)}
+                >
+                  Demander d&eacute;mo (15min)
+                </Button>
+                <a
+                  href="#tarifs"
                   className="inline-flex items-center justify-center gap-2 font-display font-medium px-6 py-3.5 text-lg rounded-xl border-2 border-white/20 text-white hover:bg-white/10 hover:border-white/30 transition-all duration-200"
                 >
-                  <Calendar className="w-5 h-5" />
-                  Planifier une d&eacute;mo
-                </button>
+                  Tarifs d&egrave;s 299&euro;
+                  <ChevronRight className="w-5 h-5" />
+                </a>
               </div>
 
               <p className="mt-6 text-sm text-navy-400 animate-slide-up stagger-3">

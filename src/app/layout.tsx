@@ -3,13 +3,13 @@ import './globals.css'
 import { Toaster } from 'react-hot-toast'
 
 export const metadata: Metadata = {
-  title: 'FinSoft | Pilotez votre rentabilité',
-  description: 'Calculez votre seuil de rentabilité en 30 secondes. La solution simple et efficace pour les comptables et PME.',
-  keywords: ['comptabilité', 'seuil de rentabilité', 'PME', 'Dijon', 'gestion financière'],
+  title: 'FinSoft | OCR Factures, SIREN & TVA — Comptabilité automatisée',
+  description: 'Automatisez votre comptabilité avec OCR factures, enrichissement SIREN, validation TVA UE (VIES) et rapprochement bancaire intelligent. Logiciel local RGPD, licence perpétuelle dès 299€.',
+  keywords: ['comptabilité', 'OCR factures', 'SIREN', 'TVA intracommunautaire', 'VIES', 'rapprochement bancaire', 'PME', 'cabinet comptable', 'RGPD', 'Dijon'],
   authors: [{ name: 'FinSoft' }],
   openGraph: {
-    title: 'FinSoft | Pilotez votre rentabilité',
-    description: 'Calculez votre seuil de rentabilité en 30 secondes.',
+    title: 'FinSoft | OCR Factures, SIREN & TVA — Comptabilité automatisée',
+    description: 'Automatisez votre comptabilité avec OCR factures, SIREN, validation TVA UE et rapprochement bancaire intelligent. Licence perpétuelle dès 299€.',
     type: 'website',
     locale: 'fr_FR',
   },
