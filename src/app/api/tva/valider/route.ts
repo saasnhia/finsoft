@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { validerTVAIntracom } from '@/lib/api/api-vies'
+import { requirePlanFeature, isAuthed } from '@/lib/auth/require-plan'
 
 /**
  * POST /api/tva/valider
  * Valide un numero de TVA intracommunautaire via VIES
+ * Requiert: plan Cabinet ou Entreprise
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.json({ success: false, error: 'Non authentifie' }, { status: 401 })
-    }
+    const auth = await requirePlanFeature('vies')
+    if (!isAuthed(auth)) return auth
 
     const body = await request.json()
     const { numero_tva } = body

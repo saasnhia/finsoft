@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { PlanBadge } from '@/components/plan/PlanGate'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -180,9 +181,10 @@ export function Sidebar() {
       </div>
 
       {/* Footer */}
-      <div className="px-3 py-3 border-t border-white/5">
+      <div className="px-3 py-3 border-t border-white/5 flex flex-col items-center gap-1">
+        <PlanBadge />
         <p className="text-[10px] text-neutral-600 text-center">
-          FinSoft v2.1 — Phase 8
+          FinSoft v2.1
         </p>
       </div>
     </aside>

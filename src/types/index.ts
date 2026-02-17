@@ -10,6 +10,16 @@ export interface User {
   updated_at: string
 }
 
+export interface UserProfile {
+  id: string
+  plan: 'solo' | 'cabinet' | 'entreprise'
+  factures_count: number
+  factures_limit: number
+  max_users: number
+  created_at: string
+  updated_at: string
+}
+
 export interface FinancialData {
   id: string
   user_id: string

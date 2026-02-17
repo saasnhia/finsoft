@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { matchInvoicesWithTransactions } from '@/lib/matching/invoice-matcher'
 import { detectAnomalies } from '@/lib/matching/anomaly-detector'
 import { parseSupplierHistories, updateSupplierHistory } from '@/lib/matching/learning-engine'
+import { requirePlanFeature, isAuthed } from '@/lib/auth/require-plan'
 import type { Transaction, Facture } from '@/types'
 import type { MatchingConfig, SupplierHistory } from '@/lib/matching/matching-types'
 import { DEFAULT_MATCHING_CONFIG } from '@/lib/matching/matching-types'
@@ -11,19 +12,15 @@ import { DEFAULT_MATCHING_CONFIG } from '@/lib/matching/matching-types'
  * POST /api/rapprochement/match
  * Lance le rapprochement automatique factures <-> transactions
  * avec scoring multi-criteres intelligent + apprentissage fournisseur
+ * Requiert: plan Cabinet ou Entreprise
  */
 export async function POST(req: NextRequest) {
   try {
+    const auth = await requirePlanFeature('smart_matching')
+    if (!isAuthed(auth)) return auth
+
     const supabase = await createClient()
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser()
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Non authentifie' }, { status: 401 })
-    }
+    const user = { id: auth.userId }
 
     // Optional config overrides
     const body = await req.json().catch(() => ({}))
