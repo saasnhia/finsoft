@@ -238,6 +238,15 @@ export default function DashboardPage() {
   return (
     <AppShell>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        {/* Bandeau e-invoicing 2026 */}
+        <div className="mb-4 flex items-center gap-3 px-4 py-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-sm">
+          <span className="text-emerald-700 font-medium">✅ FinSoft est conforme e-invoicing 2026 (Factur-X / EN16931)</span>
+          <Link href="/comptabilite/factures/einvoicing" className="ml-auto flex-shrink-0 text-emerald-700 hover:underline text-xs font-medium">
+            En savoir plus →
+          </Link>
+        </div>
+
         {/* Page Header */}
         <div className="flex items-start justify-between mb-8">
           <div>

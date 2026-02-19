@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
+import { DossierSwitcher } from '@/components/cabinet/DossierSwitcher'
 import {
   LogOut,
   Menu,
@@ -85,6 +86,13 @@ export function Header() {
               </span>
             </div>
           </Link>
+
+          {/* Dossier Switcher — visible only when authenticated */}
+          {user && (
+            <div className="hidden md:flex items-center">
+              <DossierSwitcher />
+            </div>
+          )}
 
           {/* Desktop Tabs */}
           {user && (

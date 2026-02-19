@@ -24,6 +24,9 @@ import {
   Users,
   Link2,
   Bell,
+  Plug,
+  FileCheck,
+  Briefcase,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -56,11 +59,19 @@ const sections: SidebarSection[] = [
     ],
   },
   {
+    label: 'Cabinet',
+    icon: Briefcase,
+    items: [
+      { name: 'Mes dossiers', href: '/cabinet', icon: FolderOpen },
+      { name: 'E-invoicing 2026', href: '/comptabilite/factures/einvoicing', icon: FileCheck },
+    ],
+  },
+  {
     label: 'Paramètres',
     icon: Settings,
     items: [
-      { name: 'Général', href: '/parametres', icon: Sliders },
-      { name: 'Intégrations', href: '/parametres/banques', icon: Link2 },
+      { name: 'Général', href: '/settings', icon: Sliders },
+      { name: 'Intégrations', href: '/parametres/integrations', icon: Plug },
       { name: 'Utilisateurs', href: '/admin/users', icon: Users },
     ],
   },

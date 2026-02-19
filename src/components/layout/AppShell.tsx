@@ -2,6 +2,7 @@
 
 import { Header } from './Header'
 import { Sidebar } from './Sidebar'
+import { DossierProvider } from '@/contexts/DossierContext'
 
 interface AppShellProps {
   children: React.ReactNode
@@ -13,14 +14,16 @@ interface AppShellProps {
  */
 export function AppShell({ children }: AppShellProps) {
   return (
-    <div className="min-h-screen bg-navy-50">
-      <Header />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 min-w-0">
-          {children}
-        </main>
+    <DossierProvider>
+      <div className="min-h-screen bg-navy-50">
+        <Header />
+        <div className="flex">
+          <Sidebar />
+          <main className="flex-1 min-w-0">
+            {children}
+          </main>
+        </div>
       </div>
-    </div>
+    </DossierProvider>
   )
 }
