@@ -19,24 +19,24 @@ function RappelCard({ rappel }: { rappel: RappelMail }) {
   }
 
   return (
-    <div className="rounded-xl border border-white/10 bg-white/5 overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5 bg-white/5">
+    <div className="rounded-xl border border-gray-200 bg-gray-50 overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 bg-white">
         <div className="flex items-center gap-2 min-w-0">
-          <Mail className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-          <p className="text-sm font-medium text-white truncate">{rappel.client}</p>
-          <span className="text-xs text-neutral-500 truncate hidden sm:block">{rappel.email}</span>
+          <Mail className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+          <p className="text-sm font-medium text-gray-900 truncate">{rappel.client}</p>
+          <span className="text-xs text-gray-400 truncate hidden sm:block">{rappel.email}</span>
         </div>
         <button
           onClick={copy}
-          className="flex items-center gap-1 px-2 py-1 rounded text-xs text-neutral-400 hover:text-white hover:bg-white/10 transition-colors flex-shrink-0"
+          className="flex items-center gap-1 px-2 py-1 rounded text-xs text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors flex-shrink-0"
         >
-          {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+          {copied ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
           {copied ? 'Copié' : 'Copier'}
         </button>
       </div>
       <div className="px-4 py-3 space-y-1.5">
-        <p className="text-xs text-neutral-500">Sujet : <span className="text-neutral-300">{rappel.sujet}</span></p>
-        <p className="text-sm text-neutral-400 whitespace-pre-line leading-relaxed">{rappel.corps}</p>
+        <p className="text-xs text-gray-500">Sujet : <span className="text-gray-700">{rappel.sujet}</span></p>
+        <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">{rappel.corps}</p>
       </div>
     </div>
   )
@@ -65,7 +65,7 @@ export function MailAgent() {
   return (
     <div className="space-y-4">
       {state === 'idle' && (
-        <p className="text-sm text-neutral-400">
+        <p className="text-sm text-gray-500">
           Génère des rappels de paiement personnalisés pour vos clients avec des factures en retard.
         </p>
       )}
@@ -81,14 +81,14 @@ export function MailAgent() {
       )}
 
       {state === 'loading' && (
-        <div className="flex items-center gap-3 py-6 text-neutral-400">
-          <Loader2 className="w-5 h-5 animate-spin text-emerald-400" />
+        <div className="flex items-center gap-3 py-6 text-gray-500">
+          <Loader2 className="w-5 h-5 animate-spin text-emerald-500" />
           <span className="text-sm">Génération des rappels personnalisés…</span>
         </div>
       )}
 
       {state === 'error' && (
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-red-900/30 border border-red-500/30 text-red-300 text-sm">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
           <AlertTriangle className="w-4 h-4 flex-shrink-0" />
           {error}
         </div>
@@ -97,13 +97,13 @@ export function MailAgent() {
       {state === 'success' && result && (
         <div className="space-y-3">
           {result.rappels.length === 0 ? (
-            <div className="flex items-center gap-2 text-emerald-400 text-sm">
+            <div className="flex items-center gap-2 text-emerald-600 text-sm">
               <CheckCircle2 className="w-4 h-4" />
               Aucune facture en retard. Excellent !
             </div>
           ) : (
             <>
-              <p className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
                 {result.rappels.length} rappel{result.rappels.length > 1 ? 's' : ''} généré{result.rappels.length > 1 ? 's' : ''}
               </p>
               {result.rappels.map((r, i) => (
@@ -114,7 +114,7 @@ export function MailAgent() {
 
           <button
             onClick={run}
-            className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors"
+            className="text-xs text-gray-400 hover:text-gray-600 transition-colors"
           >
             ↻ Regénérer
           </button>
