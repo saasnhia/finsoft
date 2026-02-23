@@ -27,6 +27,7 @@ import {
   Plug,
   FileCheck,
   Briefcase,
+  Sparkles,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -120,8 +121,8 @@ export function Sidebar() {
 
   return (
     <aside className="hidden lg:flex flex-col w-[220px] bg-brand-dark border-r border-white/5 h-[calc(100vh-56px)] sticky top-14 overflow-y-auto">
-      {/* Dashboard link — always visible */}
-      <div className="px-3 pt-4 pb-2">
+      {/* Dashboard + IA links — always visible */}
+      <div className="px-3 pt-4 pb-2 space-y-0.5">
         <Link
           href="/dashboard"
           className={`
@@ -134,6 +135,19 @@ export function Sidebar() {
         >
           <LayoutDashboard className="w-4 h-4" />
           Tableau de bord
+        </Link>
+        <Link
+          href="/ia"
+          className={`
+            flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium transition-colors
+            ${pathname === '/ia'
+              ? 'bg-brand-green-primary text-white'
+              : 'text-neutral-400 hover:bg-white/5 hover:text-white'
+            }
+          `}
+        >
+          <Sparkles className="w-4 h-4" />
+          Assistant IA
         </Link>
       </div>
 
