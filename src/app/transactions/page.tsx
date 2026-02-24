@@ -1,15 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { AppShell } from '@/components/layout'
 import { Card, Button, Input } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
 import { useFinancialData } from '@/hooks/useFinancialData'
 import { CATEGORY_LABELS, type TransactionCategory } from '@/types'
 import { formatCurrency } from '@/lib/calculations'
-import { 
-  Plus, 
-  Trash2, 
+import { StatusBadge } from '@/components/rapprochement/StatusBadge'
+import { QuickValidateButton } from '@/components/rapprochement/QuickValidateButton'
+import type { RapprochementStatus, RapprochementType } from '@/components/rapprochement/StatusBadge'
+import {
+  Plus,
+  Trash2,
   Filter,
   ArrowUpRight,
   ArrowDownRight,
@@ -17,15 +20,35 @@ import {
   Tag,
   Loader2,
   X,
+  ArrowRightLeft,
 } from 'lucide-react'
+
+// ----------------------------------------------------------------
+// Types
+// ----------------------------------------------------------------
+
+interface RapprochementInfo {
+  id: string
+  statut: RapprochementStatus
+  type: RapprochementType
+  confidence_score: number | null
+}
+
+// ----------------------------------------------------------------
+// Page
+// ----------------------------------------------------------------
 
 export default function TransactionsPage() {
   const { user, loading: authLoading } = useAuth()
   const { transactions, loading: dataLoading, addTransaction, deleteTransaction } = useFinancialData(user?.id)
-  
+
   const [showAddForm, setShowAddForm] = useState(false)
   const [filterType, setFilterType] = useState<'all' | 'income' | 'expense'>('all')
-  
+
+  // Rapprochement data
+  const [rapMap, setRapMap] = useState<Map<string, RapprochementInfo>>(new Map())
+  const [rapLoading, setRapLoading] = useState(false)
+
   // Form state
   const [formData, setFormData] = useState({
     description: '',
@@ -38,6 +61,45 @@ export default function TransactionsPage() {
   const [formLoading, setFormLoading] = useState(false)
 
   const loading = authLoading || dataLoading
+
+  // ---- Load rapprochement status for all transactions ----
+  const loadRapprochements = useCallback(async () => {
+    if (!user?.id) return
+    setRapLoading(true)
+    try {
+      const res = await fetch('/api/rapprochement/suggestions')
+      if (!res.ok) return
+      const data = await res.json() as {
+        rapprochements?: Array<{
+          id: string
+          transaction_id: string
+          statut: string
+          type: string
+          confidence_score: number | null
+        }>
+      }
+      const map = new Map<string, RapprochementInfo>()
+      for (const r of data.rapprochements ?? []) {
+        map.set(r.transaction_id, {
+          id: r.id,
+          statut: r.statut as RapprochementStatus,
+          type: r.type as RapprochementType,
+          confidence_score: r.confidence_score,
+        })
+      }
+      setRapMap(map)
+    } catch {
+      // silent
+    } finally {
+      setRapLoading(false)
+    }
+  }, [user?.id])
+
+  useEffect(() => {
+    if (!dataLoading && user?.id) {
+      loadRapprochements()
+    }
+  }, [dataLoading, user?.id, loadRapprochements])
 
   const filteredTransactions = transactions.filter(t => {
     if (filterType === 'all') return true
@@ -93,7 +155,7 @@ export default function TransactionsPage() {
 
   return (
     <AppShell>
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -104,7 +166,7 @@ export default function TransactionsPage() {
               Gérez vos revenus et dépenses
             </p>
           </div>
-          
+
           <Button
             onClick={() => setShowAddForm(true)}
             icon={<Plus className="w-5 h-5" />}
@@ -125,8 +187,8 @@ export default function TransactionsPage() {
                   onClick={() => setFilterType(type)}
                   className={`
                     px-4 py-2 rounded-lg text-sm font-medium transition-colors
-                    ${filterType === type 
-                      ? 'bg-navy-900 text-white' 
+                    ${filterType === type
+                      ? 'bg-navy-900 text-white'
                       : 'bg-navy-100 text-navy-600 hover:bg-navy-200'
                     }
                   `}
@@ -137,13 +199,19 @@ export default function TransactionsPage() {
                 </button>
               ))}
             </div>
+            {rapLoading && (
+              <span className="ml-auto flex items-center gap-1.5 text-xs text-slate-400">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                Chargement rapprochements…
+              </span>
+            )}
           </div>
         </Card>
 
         {/* Add Transaction Form Modal */}
         {showAddForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div 
+            <div
               className="absolute inset-0 bg-navy-900/50 backdrop-blur-sm"
               onClick={() => setShowAddForm(false)}
             />
@@ -161,7 +229,6 @@ export default function TransactionsPage() {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Type */}
                 <div className="flex gap-2">
                   <button
                     type="button"
@@ -283,16 +350,21 @@ export default function TransactionsPage() {
             </div>
           ) : (
             <div className="divide-y divide-navy-100">
-              {filteredTransactions.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="flex items-center justify-between p-4 hover:bg-navy-50 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
+              {filteredTransactions.map((transaction) => {
+                const rap = rapMap.get(transaction.id)
+                const rapStatut: RapprochementStatus = rap ? rap.statut : 'none'
+                const showQuickValidate = rap?.statut === 'suggestion'
+
+                return (
+                  <div
+                    key={transaction.id}
+                    className="flex items-center justify-between p-4 hover:bg-navy-50 transition-colors gap-3"
+                  >
+                    {/* Icon */}
                     <div className={`
-                      p-2 rounded-lg
-                      ${transaction.type === 'income' 
-                        ? 'bg-emerald-100' 
+                      flex-shrink-0 p-2 rounded-lg
+                      ${transaction.type === 'income'
+                        ? 'bg-emerald-100'
                         : 'bg-coral-100'
                       }
                     `}>
@@ -302,12 +374,13 @@ export default function TransactionsPage() {
                         <ArrowDownRight className="w-5 h-5 text-coral-600" />
                       )}
                     </div>
-                    
-                    <div>
-                      <p className="font-medium text-navy-900">
+
+                    {/* Description + meta */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-navy-900 truncate">
                         {transaction.description}
                       </p>
-                      <div className="flex items-center gap-3 mt-1">
+                      <div className="flex items-center flex-wrap gap-2 mt-1">
                         <span className="flex items-center gap-1 text-xs text-navy-400">
                           <Calendar className="w-3 h-3" />
                           {new Date(transaction.date).toLocaleDateString('fr-FR')}
@@ -323,34 +396,65 @@ export default function TransactionsPage() {
                         )}
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center gap-4">
-                    <span className={`
-                      font-mono font-semibold
-                      ${transaction.type === 'income' 
-                        ? 'text-emerald-600' 
-                        : 'text-coral-600'
-                      }
-                    `}>
-                      {transaction.type === 'income' ? '+' : '-'}
-                      {formatCurrency(transaction.amount)}
-                    </span>
-                    
-                    {user && (
-                      <button
-                        onClick={() => handleDelete(transaction.id)}
-                        className="p-2 text-navy-400 hover:text-coral-600 hover:bg-coral-50 rounded-lg transition-colors"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                    {/* Rapprochement status — only for expense transactions */}
+                    {transaction.type === 'expense' && (
+                      <div className="flex-shrink-0 flex items-center gap-2">
+                        <StatusBadge
+                          statut={rapStatut}
+                          type={rap?.type ?? null}
+                          confidence={rap?.confidence_score ?? undefined}
+                        />
+                        {showQuickValidate && rap && (
+                          <QuickValidateButton
+                            rapprochementId={rap.id}
+                            onValidated={loadRapprochements}
+                          />
+                        )}
+                      </div>
                     )}
+
+                    {/* Amount + delete */}
+                    <div className="flex-shrink-0 flex items-center gap-3">
+                      <span className={`
+                        font-mono font-semibold
+                        ${transaction.type === 'income'
+                          ? 'text-emerald-600'
+                          : 'text-coral-600'
+                        }
+                      `}>
+                        {transaction.type === 'income' ? '+' : '-'}
+                        {formatCurrency(transaction.amount)}
+                      </span>
+
+                      {user && (
+                        <button
+                          onClick={() => handleDelete(transaction.id)}
+                          className="p-2 text-navy-400 hover:text-coral-600 hover:bg-coral-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </Card>
+
+        {/* Link to rapprochement page */}
+        {rapMap.size > 0 && (
+          <div className="mt-4 text-center">
+            <a
+              href="/rapprochement"
+              className="inline-flex items-center gap-2 text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+            >
+              <ArrowRightLeft className="h-4 w-4" />
+              Gérer tous les rapprochements →
+            </a>
+          </div>
+        )}
       </main>
     </AppShell>
   )

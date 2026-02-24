@@ -62,7 +62,7 @@ export async function runAutoMatchForUser(
     supplierHistories
   )
 
-  // 5. Sauvegarder résultats
+  // 5. Sauvegarder résultats + logs automation
   const autoInserts = matchResult.auto_matched.map(m => ({
     user_id: userId,
     facture_id: m.facture.id,
@@ -101,6 +101,49 @@ export async function runAutoMatchForUser(
       .eq('validated_by_user', false)
 
     await supabase.from('rapprochements_factures').insert(allInserts)
+  }
+
+  // Log auto-matched actions
+  if (matchResult.auto_matched.length > 0) {
+    await supabase.from('automation_log').insert(
+      matchResult.auto_matched.map(m => ({
+        user_id: userId,
+        action_type: 'auto_match' as const,
+        entity_type: 'transaction' as const,
+        entity_id: m.transaction.id,
+        metadata: {
+          facture_id: m.facture.id,
+          confidence: m.confidence,
+          fournisseur: m.facture.fournisseur ?? null,
+          amount: m.transaction.amount,
+          score_amount: m.score.amount,
+          score_date: m.score.date,
+          score_supplier: m.score.supplier,
+        },
+        is_reversible: true,
+        is_reversed: false,
+      }))
+    )
+  }
+
+  // Log suggestions
+  if (matchResult.suggestions.length > 0) {
+    await supabase.from('automation_log').insert(
+      matchResult.suggestions.map(m => ({
+        user_id: userId,
+        action_type: 'match_suggested' as const,
+        entity_type: 'transaction' as const,
+        entity_id: m.transaction.id,
+        metadata: {
+          facture_id: m.facture.id,
+          confidence: m.confidence,
+          fournisseur: m.facture.fournisseur ?? null,
+          amount: m.transaction.amount,
+        },
+        is_reversible: false,
+        is_reversed: false,
+      }))
+    )
   }
 
   // 6. Mettre à jour l'historique fournisseurs
