@@ -22,12 +22,12 @@ import {
   ChevronDown,
   Sliders,
   Users,
-  Link2,
   Bell,
   Plug,
   FileCheck,
   Briefcase,
   Sparkles,
+  BarChart3,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -55,7 +55,7 @@ const sections: SidebarSection[] = [
     label: 'Audit',
     icon: Shield,
     items: [
-      { name: 'Calcul seuils', href: '/audit/seuils', icon: Shield },
+      { name: 'Balance âgée', href: '/audit/balance-agee', icon: BarChart3 },
       { name: 'Tri comptes', href: '/audit/comptes', icon: FolderOpen },
     ],
   },
