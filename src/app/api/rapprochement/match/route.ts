@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       .from('factures')
       .select('*')
       .eq('user_id', user.id)
-      .in('statut', ['en_attente', 'validee', 'brouillon'])
+      .in('statut', ['en_attente', 'validee'])
       .order('date_facture', { ascending: false })
 
     if (fError) {

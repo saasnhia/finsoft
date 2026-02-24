@@ -487,9 +487,19 @@ export async function POST(req: NextRequest) {
       const result = await mammoth.extractRawText({ buffer });
       ocrResult = { text: result.value, confidence: 0.95 };
     } else if (fileType === 'pdf') {
-      // PDF: extract text directly with pdfjs-dist
+      // PDF: extract text directly with pdf2json
       console.log('[API] Extracting text from PDF...');
-      const pdfText = await extractTextFromPdf(buffer);
+      let pdfText: string;
+      try {
+        pdfText = await extractTextFromPdf(buffer);
+      } catch (pdfErr: unknown) {
+        const details = pdfErr instanceof Error ? pdfErr.message : String(pdfErr);
+        console.error('[API] PDF parse error:', details);
+        return NextResponse.json(
+          { error: 'PDF invalide ou corrompu', details },
+          { status: 422 }
+        );
+      }
       if (pdfText.length > 20) {
         // Text-based PDF: use extracted text directly
         ocrResult = { text: pdfText, confidence: 0.95 };
