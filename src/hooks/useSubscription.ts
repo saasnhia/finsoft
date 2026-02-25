@@ -51,7 +51,7 @@ export function useSubscription(): UseSubscriptionResult {
         .limit(1)
         .maybeSingle()
 
-      console.log('[sub result]', { data, error })
+      console.log('[sub result] data:', JSON.stringify(data), '| error:', JSON.stringify(error))
       setSubscription(data as Subscription | null)
       setLoading(false)
     }
