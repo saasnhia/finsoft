@@ -1,8 +1,11 @@
-// pricing v3 — fond clair + toggle Cabinet/Entreprise
+// pricing v4 — Stripe checkout
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Header, Footer } from '@/components/layout'
+import { useAuth } from '@/hooks/useAuth'
+import { toast } from 'react-hot-toast'
 import {
   CheckCircle2,
   ChevronRight,
@@ -13,6 +16,7 @@ import {
   Lock,
   Info,
   Factory,
+  Loader2,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -220,8 +224,11 @@ function FeatureItem({ f }: { f: FeatureRow }) {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function PricingPage() {
+  const { user } = useAuth()
+  const router = useRouter()
   const [subscriptionRequired, setSubscriptionRequired] = useState(false)
   const [mode, setMode] = useState<ProfileMode>('cabinet')
+  const [subscribing, setSubscribing] = useState<string | null>(null)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -231,6 +238,31 @@ export default function PricingPage() {
       }
     }
   }, [])
+
+  const handleSubscribe = async (planId: 'starter' | 'cabinet' | 'pro') => {
+    if (!user) {
+      router.push('/login?redirect=/pricing')
+      return
+    }
+    setSubscribing(planId)
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ plan: planId }),
+      })
+      const data = await res.json() as { url?: string; error?: string }
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        toast.error(data.error ?? 'Erreur lors de la création du paiement')
+        setSubscribing(null)
+      }
+    } catch {
+      toast.error('Erreur réseau')
+      setSubscribing(null)
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -341,13 +373,17 @@ export default function PricingPage() {
 
                   {/* CTA */}
                   <div className="px-8 py-5 border-b border-slate-100">
-                    <a
-                      href={`mailto:contact@finsoft.fr?subject=${encodeURIComponent(plan.mailSubject)}`}
-                      className={`w-full inline-flex items-center justify-center gap-2 font-semibold px-4 py-3 text-sm rounded-xl transition-all duration-200 ${plan.ctaClass}`}
+                    <button
+                      onClick={() => handleSubscribe(plan.id)}
+                      disabled={subscribing === plan.id}
+                      className={`w-full inline-flex items-center justify-center gap-2 font-semibold px-4 py-3 text-sm rounded-xl transition-all duration-200 disabled:opacity-70 disabled:cursor-wait ${plan.ctaClass}`}
                     >
-                      {plan.ctaLabel}
-                      <ChevronRight className="w-4 h-4" />
-                    </a>
+                      {subscribing === plan.id ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <>S&apos;abonner <ChevronRight className="w-4 h-4" /></>
+                      )}
+                    </button>
                   </div>
 
                   {/* Features */}

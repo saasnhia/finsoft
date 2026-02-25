@@ -1,11 +1,13 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { AppShell } from '@/components/layout'
 import { Card } from '@/components/ui'
 import { ExportFECModal, InsightsPanel, UniversalImportHub, ImportHistoryList } from '@/components/dashboard'
 import { EntrepriseDashboardPanel } from '@/components/entreprise/KpiCards'
 import { useAuth } from '@/hooks/useAuth'
+import { useSubscription } from '@/hooks/useSubscription'
 import {
   Clock,
   AlertCircle,
@@ -250,9 +252,18 @@ function BalanceAgeeWidget({ items, loading, mode }: BalanceAgeeWidgetProps) {
 
 export default function DashboardPage() {
   const { user } = useAuth()
+  const router = useRouter()
+  const { isActive, loading: subLoading } = useSubscription()
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [showFECModal, setShowFECModal] = useState(false)
+
+  // Redirect to pricing if authenticated but no active subscription
+  useEffect(() => {
+    if (!subLoading && user && !isActive) {
+      router.push('/pricing?message=subscription_required')
+    }
+  }, [subLoading, user, isActive, router])
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -268,9 +279,9 @@ export default function DashboardPage() {
   }, [])
 
   useEffect(() => {
-    if (user) fetchData()
-    else setLoading(false)
-  }, [user, fetchData])
+    if (user && isActive) fetchData()
+    else if (!user) setLoading(false)
+  }, [user, isActive, fetchData])
 
   const handleValidateRapprochement = async (id: string) => {
     try {
