@@ -26,8 +26,11 @@ tessdata/
 # TypeScript build cache
 tsconfig.tsbuildinfo
 
-# Claude
-.claude/
+# Claude — fichiers sensibles uniquement (mcp.json et settings contiennent des clés)
+.claude/mcp.json
+.claude/settings.local.json
+.claude/settings.json
+# MCP_SETUP.md est commitable (pas de secrets)
 .vercel
 
 # Playwright
