@@ -40,39 +40,51 @@ export async function POST(req: NextRequest) {
 
       // ── Paiement initial réussi ──────────────────────────────────────────
       case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session
-        if (session.mode !== 'subscription' || !session.subscription) break
-
+        const session        = event.data.object as Stripe.Checkout.Session
         const subscriptionId = session.subscription as string
         const userId         = session.metadata?.user_id
-        const plan           = session.metadata?.plan ?? 'starter'
+        const plan           = session.metadata?.plan
 
-        if (!userId) break
+        if (!userId || !subscriptionId) break
 
-        // Retrieve full subscription object to access current_period_end
-        // In Stripe API 2026-01-28, current_period_end is on the SubscriptionItem
-        const subscription = await stripe.subscriptions.retrieve(subscriptionId)
-        const periodEndTs  = subscription.items.data[0]?.current_period_end ?? 0
-        const periodEnd    = periodEndTs > 0 ? new Date(periodEndTs * 1000).toISOString() : null
+        // Retrieve full subscription with expanded items to inspect structure
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+          expand: ['items.data.price'],
+        })
 
-        await supabase
+        // Log raw structure for Vercel inspection
+        console.log('[webhook] subscription object:', JSON.stringify(subscription, null, 2))
+
+        // Defensive: current_period_end may be top-level or on the first item
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rawPeriodEnd = (subscription as any).current_period_end
+          ?? subscription.items?.data?.[0]?.current_period_end
+          ?? null
+
+        const currentPeriodEnd = rawPeriodEnd
+          ? new Date(Number(rawPeriodEnd) * 1000).toISOString()
+          : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString()
+
+        const { error: upsertError } = await supabase
           .from('subscriptions')
           .upsert(
             {
               user_id:                userId,
               stripe_customer_id:     session.customer as string,
               stripe_subscription_id: subscriptionId,
-              plan,
+              plan:                   plan ?? 'starter',
               status:                 subscription.status,
-              current_period_end:     periodEnd,
+              current_period_end:     currentPeriodEnd,
             },
             { onConflict: 'user_id' }
           )
 
+        if (upsertError) console.error('[webhook] Supabase upsert error:', upsertError)
+
         // Sync plan into user_profiles
         await supabase
           .from('user_profiles')
-          .update({ plan })
+          .update({ plan: plan ?? 'starter' })
           .eq('id', userId)
 
         break
