@@ -11,6 +11,7 @@ import {
   Clock,
   Lock,
   Info,
+  Factory,
 } from 'lucide-react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -20,6 +21,8 @@ type FeatureRow =
   | { type: 'locked'; label: string; requiredPlan: string }
   | { type: 'soon'; label: string; note: string }
 
+type ProfileMode = 'cabinet' | 'entreprise'
+
 interface Plan {
   id: 'starter' | 'cabinet' | 'pro'
   name: string
@@ -27,18 +30,17 @@ interface Plan {
   priceAnnual: number
   priceMonthly: number
   popular: boolean
-  icon: React.ReactNode
   accentBorder: string
-  iconBg: string
+  headerBg: string
+  badgeColor: string
   priceColor: string
   ctaClass: string
   ctaLabel: string
-  cabinetFeatures: FeatureRow[]
-  entrepriseFeatures: FeatureRow[]
   mailSubject: string
+  features: Record<ProfileMode, FeatureRow[]>
 }
 
-// ─── Plan data ────────────────────────────────────────────────────────────────
+// ─── Plans data ───────────────────────────────────────────────────────────────
 
 const PLANS: Plan[] = [
   {
@@ -48,44 +50,47 @@ const PLANS: Plan[] = [
     priceAnnual: 290,
     priceMonthly: 24,
     popular: false,
-    icon: <Users className="w-6 h-6 text-slate-300" />,
-    accentBorder: 'border-slate-600',
-    iconBg: 'bg-slate-700/60',
-    priceColor: 'text-white',
-    ctaClass: 'border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white',
+    accentBorder: 'border-slate-200',
+    headerBg: 'bg-slate-50',
+    badgeColor: '',
+    priceColor: 'text-slate-900',
+    ctaClass: 'border border-slate-300 hover:border-slate-500 text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50',
     ctaLabel: 'Choisir Starter',
     mailSubject: 'Souscription plan Starter FinSoft — 290€/an',
-    cabinetFeatures: [
-      { type: 'included', label: '1 utilisateur' },
-      { type: 'included', label: '300 factures / an' },
-      { type: 'included', label: 'OCR Factures (Mistral IA)' },
-      { type: 'included', label: 'Enrichissement SIREN' },
-      { type: 'included', label: 'Validation TVA intracommunautaire (VIES)' },
-      { type: 'included', label: 'Import universel (PDF / FEC / CSV / Excel)' },
-      { type: 'included', label: 'Balance âgée' },
-      { type: 'included', label: 'Support email' },
-      { type: 'locked', label: 'Règles automatiques de catégorisation', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Rapprochement bancaire automatique', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Dashboard automatisation & rollback', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Synchronisation Sage (Chift)', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Alertes KPI automatiques', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Audit IA', requiredPlan: 'Cabinet' },
-    ],
-    entrepriseFeatures: [
-      { type: 'included', label: '1 utilisateur' },
-      { type: 'included', label: '300 factures / an' },
-      { type: 'included', label: 'OCR Factures (Mistral IA)' },
-      { type: 'included', label: 'Enrichissement SIREN' },
-      { type: 'included', label: 'Import universel (PDF / FEC / CSV / Excel)' },
-      { type: 'included', label: 'Balance âgée' },
-      { type: 'included', label: 'Dashboard KPI entreprise' },
-      { type: 'included', label: 'Support email' },
-      { type: 'locked', label: 'Dépenses par catégorie PCG', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Prévision trésorerie 30/60/90j', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Rapprochement bancaire automatique', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Règles automatiques de catégorisation', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Alertes KPI automatiques', requiredPlan: 'Cabinet' },
-    ],
+    features: {
+      cabinet: [
+        { type: 'included', label: '1 utilisateur' },
+        { type: 'included', label: '300 factures / an' },
+        { type: 'included', label: 'OCR Factures (Mistral IA)' },
+        { type: 'included', label: 'Enrichissement SIREN' },
+        { type: 'included', label: 'Validation TVA intracommunautaire (VIES)' },
+        { type: 'included', label: 'Import universel (PDF / FEC / CSV / Excel)' },
+        { type: 'included', label: 'Balance âgée' },
+        { type: 'included', label: 'Support email' },
+        { type: 'locked', label: 'Règles auto catégorisation', requiredPlan: 'Cabinet' },
+        { type: 'locked', label: 'Rapprochement bancaire automatique', requiredPlan: 'Cabinet' },
+        { type: 'locked', label: 'Dashboard automatisation & rollback', requiredPlan: 'Cabinet' },
+        { type: 'locked', label: 'Score risque fournisseur (Pappers)', requiredPlan: 'Cabinet' },
+        { type: 'locked', label: 'Alertes KPI automatiques', requiredPlan: 'Cabinet' },
+        { type: 'locked', label: 'Audit IA', requiredPlan: 'Cabinet' },
+      ],
+      entreprise: [
+        { type: 'included', label: '1 utilisateur' },
+        { type: 'included', label: '300 factures / an' },
+        { type: 'included', label: 'OCR Factures fournisseurs (Mistral IA)' },
+        { type: 'included', label: 'Enrichissement SIREN' },
+        { type: 'included', label: 'Validation TVA intracommunautaire (VIES)' },
+        { type: 'included', label: 'Import relevés CSV / OFX' },
+        { type: 'included', label: 'Dashboard KPI trésorerie' },
+        { type: 'included', label: 'Balance âgée' },
+        { type: 'included', label: 'Support email' },
+        { type: 'locked', label: 'Règles auto catégorisation dépenses', requiredPlan: 'Cabinet' },
+        { type: 'locked', label: 'Rapprochement bancaire automatique', requiredPlan: 'Cabinet' },
+        { type: 'locked', label: 'Graphiques dépenses par catégorie PCG', requiredPlan: 'Cabinet' },
+        { type: 'locked', label: 'Prévision trésorerie 30/60/90j', requiredPlan: 'Cabinet' },
+        { type: 'locked', label: 'Alertes KPI automatiques', requiredPlan: 'Cabinet' },
+      ],
+    },
   },
   {
     id: 'cabinet',
@@ -94,46 +99,48 @@ const PLANS: Plan[] = [
     priceAnnual: 890,
     priceMonthly: 74,
     popular: true,
-    icon: <Building2 className="w-6 h-6 text-emerald-400" />,
-    accentBorder: 'border-emerald-500',
-    iconBg: 'bg-emerald-500/10',
-    priceColor: 'text-emerald-400',
-    ctaClass: 'bg-emerald-500 hover:bg-emerald-400 text-white',
+    accentBorder: 'border-emerald-400',
+    headerBg: 'bg-emerald-50',
+    badgeColor: 'bg-emerald-500',
+    priceColor: 'text-emerald-700',
+    ctaClass: 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/30',
     ctaLabel: 'Choisir Cabinet',
     mailSubject: 'Souscription plan Cabinet FinSoft — 890€/an',
-    cabinetFeatures: [
-      { type: 'included', label: '10 utilisateurs' },
-      { type: 'included', label: 'Factures illimitées' },
-      { type: 'included', label: 'OCR + SIREN + VIES + Import universel' },
-      { type: 'included', label: 'Règles automatiques de catégorisation (PCG)' },
-      { type: 'included', label: 'Rapprochement bancaire automatique (5 critères)' },
-      { type: 'included', label: 'Dashboard automatisation & rollback' },
-      { type: 'included', label: 'Synchronisation Sage via Chift' },
-      { type: 'included', label: 'Score risque fournisseur (Pappers)' },
-      { type: 'included', label: 'Alertes KPI automatiques' },
-      { type: 'included', label: 'Audit IA' },
-      { type: 'soon', label: 'Cegid Loop (OAuth2 XRP Flex)', note: 'T2 2026' },
-      { type: 'included', label: 'Support prioritaire' },
-      { type: 'locked', label: 'API dédiée FinSoft', requiredPlan: 'Pro' },
-      { type: 'locked', label: 'Intégration ERP sur-mesure', requiredPlan: 'Pro' },
-      { type: 'locked', label: 'Support dédié 6h/jour + SLA', requiredPlan: 'Pro' },
-    ],
-    entrepriseFeatures: [
-      { type: 'included', label: '10 utilisateurs' },
-      { type: 'included', label: 'Factures illimitées' },
-      { type: 'included', label: 'OCR + SIREN + VIES + Import universel' },
-      { type: 'included', label: 'Dashboard KPI entreprise (solde, charges, trésorerie)' },
-      { type: 'included', label: 'Dépenses par catégorie PCG (graphique + table)' },
-      { type: 'included', label: 'Prévision trésorerie 30/60/90 jours' },
-      { type: 'included', label: 'Rapprochement bancaire automatique' },
-      { type: 'included', label: 'Règles automatiques de catégorisation' },
-      { type: 'included', label: 'Alertes KPI automatiques' },
-      { type: 'included', label: 'Audit IA' },
-      { type: 'included', label: 'Support prioritaire' },
-      { type: 'locked', label: 'API dédiée FinSoft', requiredPlan: 'Pro' },
-      { type: 'locked', label: 'Intégration ERP sur-mesure', requiredPlan: 'Pro' },
-      { type: 'locked', label: 'Support dédié 6h/jour + SLA', requiredPlan: 'Pro' },
-    ],
+    features: {
+      cabinet: [
+        { type: 'included', label: '10 utilisateurs' },
+        { type: 'included', label: 'Factures illimitées' },
+        { type: 'included', label: 'OCR + SIREN + VIES + Import universel' },
+        { type: 'included', label: 'Règles automatiques de catégorisation (PCG)' },
+        { type: 'included', label: 'Rapprochement bancaire automatique (5 critères)' },
+        { type: 'included', label: 'Dashboard automatisation & rollback' },
+        { type: 'included', label: 'Synchronisation Sage via Chift' },
+        { type: 'included', label: 'Score risque fournisseur (Pappers)' },
+        { type: 'included', label: 'Alertes KPI automatiques' },
+        { type: 'included', label: 'Audit IA' },
+        { type: 'soon', label: 'Cegid Loop (OAuth2 XRP Flex)', note: 'T2 2026' },
+        { type: 'included', label: 'Support prioritaire' },
+        { type: 'locked', label: 'API dédiée FinSoft', requiredPlan: 'Pro' },
+        { type: 'locked', label: 'Intégration ERP sur-mesure', requiredPlan: 'Pro' },
+        { type: 'locked', label: 'Support dédié 6h/jour + SLA', requiredPlan: 'Pro' },
+      ],
+      entreprise: [
+        { type: 'included', label: '10 utilisateurs' },
+        { type: 'included', label: 'Factures illimitées' },
+        { type: 'included', label: 'OCR + SIREN + VIES + Import universel' },
+        { type: 'included', label: 'Règles automatiques de catégorisation dépenses' },
+        { type: 'included', label: 'Rapprochement bancaire automatique' },
+        { type: 'included', label: 'Dashboard automatisation & rollback' },
+        { type: 'included', label: 'Graphiques dépenses par catégorie PCG' },
+        { type: 'included', label: 'Prévision trésorerie 30/60/90 jours' },
+        { type: 'included', label: 'Relances clients automatiques' },
+        { type: 'included', label: 'Alertes KPI automatiques' },
+        { type: 'included', label: 'Support prioritaire' },
+        { type: 'locked', label: 'API dédiée FinSoft', requiredPlan: 'Pro' },
+        { type: 'locked', label: 'Intégration ERP sur-mesure', requiredPlan: 'Pro' },
+        { type: 'locked', label: 'Support dédié 6h/jour + SLA', requiredPlan: 'Pro' },
+      ],
+    },
   },
   {
     id: 'pro',
@@ -142,33 +149,35 @@ const PLANS: Plan[] = [
     priceAnnual: 1900,
     priceMonthly: 158,
     popular: false,
-    icon: <Zap className="w-6 h-6 text-violet-400" />,
-    accentBorder: 'border-violet-600',
-    iconBg: 'bg-violet-500/10',
-    priceColor: 'text-violet-400',
-    ctaClass: 'bg-violet-600 hover:bg-violet-500 text-white',
+    accentBorder: 'border-violet-300',
+    headerBg: 'bg-violet-50',
+    badgeColor: '',
+    priceColor: 'text-violet-700',
+    ctaClass: 'bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-500/20',
     ctaLabel: 'Contacter l\'équipe',
     mailSubject: 'Souscription plan Pro FinSoft — 1900€/an',
-    cabinetFeatures: [
-      { type: 'included', label: 'Utilisateurs illimités' },
-      { type: 'included', label: 'Tout illimité + custom' },
-      { type: 'included', label: 'Tout le plan Cabinet inclus' },
-      { type: 'included', label: 'API dédiée FinSoft' },
-      { type: 'included', label: 'Intégration ERP sur-mesure' },
-      { type: 'included', label: 'Support dédié 6h/jour' },
-      { type: 'included', label: 'SLA garanti' },
-      { type: 'soon', label: 'Cegid Loop inclus', note: 'T2 2026' },
-    ],
-    entrepriseFeatures: [
-      { type: 'included', label: 'Utilisateurs illimités' },
-      { type: 'included', label: 'Tout illimité + custom' },
-      { type: 'included', label: 'Tout le plan Cabinet inclus' },
-      { type: 'included', label: 'API dédiée FinSoft' },
-      { type: 'included', label: 'Intégration ERP sur-mesure' },
-      { type: 'included', label: 'Connexions ERP multiples (Sage, Cegid…)' },
-      { type: 'included', label: 'Support dédié 6h/jour' },
-      { type: 'included', label: 'SLA garanti' },
-    ],
+    features: {
+      cabinet: [
+        { type: 'included', label: 'Utilisateurs illimités' },
+        { type: 'included', label: 'Tout illimité + custom' },
+        { type: 'included', label: 'Tout le plan Cabinet inclus' },
+        { type: 'included', label: 'API dédiée FinSoft' },
+        { type: 'included', label: 'Intégration ERP sur-mesure' },
+        { type: 'included', label: 'Support dédié 6h/jour' },
+        { type: 'included', label: 'SLA garanti' },
+        { type: 'soon', label: 'Cegid Loop inclus', note: 'T2 2026' },
+      ],
+      entreprise: [
+        { type: 'included', label: 'Utilisateurs illimités' },
+        { type: 'included', label: 'Tout illimité + custom' },
+        { type: 'included', label: 'Tout le plan Cabinet inclus' },
+        { type: 'included', label: 'API dédiée FinSoft' },
+        { type: 'included', label: 'Intégration ERP sur-mesure' },
+        { type: 'included', label: 'Connexions ERP multiples (Sage, Cegid…)' },
+        { type: 'included', label: 'Support dédié 6h/jour' },
+        { type: 'included', label: 'SLA garanti' },
+      ],
+    },
   },
 ]
 
@@ -177,19 +186,19 @@ const PLANS: Plan[] = [
 function FeatureItem({ f }: { f: FeatureRow }) {
   if (f.type === 'included') {
     return (
-      <li className="flex items-start gap-2 text-sm text-slate-300">
-        <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+      <li className="flex items-start gap-2 text-sm text-slate-700">
+        <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
         {f.label}
       </li>
     )
   }
   if (f.type === 'locked') {
     return (
-      <li className="flex items-start gap-2 text-sm text-slate-600">
-        <Lock className="w-4 h-4 flex-shrink-0 mt-0.5 text-slate-600" />
+      <li className="flex items-start gap-2 text-sm text-slate-400">
+        <Lock className="w-4 h-4 flex-shrink-0 mt-0.5 text-slate-300" />
         <span>
           {f.label}
-          <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-slate-700/80 text-slate-500 font-medium">
+          <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-400 font-medium border border-slate-200">
             {f.requiredPlan}+
           </span>
         </span>
@@ -198,8 +207,8 @@ function FeatureItem({ f }: { f: FeatureRow }) {
   }
   // soon
   return (
-    <li className="flex items-start gap-2 text-sm text-slate-400">
-      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-900/50 text-amber-400 font-bold whitespace-nowrap flex-shrink-0 mt-0.5">
+    <li className="flex items-start gap-2 text-sm text-slate-600">
+      <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-100 text-amber-700 font-bold whitespace-nowrap flex-shrink-0 mt-0.5 border border-amber-200">
         {f.note}
       </span>
       {f.label}
@@ -208,8 +217,6 @@ function FeatureItem({ f }: { f: FeatureRow }) {
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
-
-type ProfileMode = 'cabinet' | 'entreprise'
 
 export default function PricingPage() {
   const [subscriptionRequired, setSubscriptionRequired] = useState(false)
@@ -225,11 +232,11 @@ export default function PricingPage() {
   }, [])
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0F172A]">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
 
       <main className="flex-1">
-        {/* Banner */}
+        {/* Subscription required banner */}
         {subscriptionRequired && (
           <div className="bg-emerald-600 text-white py-3 px-4">
             <div className="max-w-7xl mx-auto flex items-center justify-center gap-2 text-sm font-medium">
@@ -239,32 +246,32 @@ export default function PricingPage() {
           </div>
         )}
 
-        <section className="py-24">
+        <section className="py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {/* Heading */}
             <div className="text-center mb-10">
-              <h1 className="text-3xl md:text-5xl font-bold text-white">
+              <h1 className="text-3xl md:text-5xl font-bold text-slate-900">
                 Tarifs FinSoft
               </h1>
-              <p className="mt-4 text-lg text-slate-400 max-w-2xl mx-auto">
+              <p className="mt-4 text-lg text-slate-500 max-w-2xl mx-auto">
                 Hébergé en Europe · Données chiffrées · RGPD compliant
               </p>
-              <div className="mt-6 inline-flex items-center gap-2 text-sm text-slate-500 bg-slate-800/60 px-4 py-2 rounded-full border border-slate-700">
+              <div className="mt-6 inline-flex items-center gap-2 text-sm text-slate-400 bg-white px-4 py-2 rounded-full border border-slate-200 shadow-sm">
                 <Info className="w-3.5 h-3.5" />
                 Prix HT · TVA 20% applicable
               </div>
             </div>
 
-            {/* Toggle Cabinet / Entreprise */}
+            {/* ── Toggle Cabinet / Entreprise ──────────────────────────────── */}
             <div className="flex justify-center mb-12">
-              <div className="flex items-center gap-1 p-1 bg-slate-800 border border-slate-700 rounded-xl">
+              <div className="flex items-center gap-1 p-1.5 bg-white border border-slate-200 rounded-2xl shadow-sm">
                 <button
                   onClick={() => setMode('cabinet')}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                     mode === 'cabinet'
-                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-slate-900 text-white shadow-md'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
                   <Building2 className="w-4 h-4" />
@@ -272,88 +279,90 @@ export default function PricingPage() {
                 </button>
                 <button
                   onClick={() => setMode('entreprise')}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                  className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                     mode === 'entreprise'
-                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
-                      : 'text-slate-400 hover:text-white'
+                      ? 'bg-slate-900 text-white shadow-md'
+                      : 'text-slate-500 hover:text-slate-800'
                   }`}
                 >
-                  <Zap className="w-4 h-4" />
+                  <Factory className="w-4 h-4" />
                   Mon entreprise
                 </button>
               </div>
             </div>
 
-            {/* Mode subtitle */}
-            <p className="text-center text-sm text-slate-500 -mt-8 mb-12">
+            <p className="text-center text-sm text-slate-400 -mt-8 mb-12">
               {mode === 'cabinet'
                 ? 'Fonctionnalités pour les cabinets comptables et leurs dossiers clients'
                 : 'Fonctionnalités pour la gestion comptable interne d\'une entreprise'}
             </p>
 
-            {/* Plans */}
+            {/* ── Plans ──────────────────────────────────────────────────────── */}
             <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto items-start">
-              {PLANS.map((plan) => {
-                const features = mode === 'cabinet' ? plan.cabinetFeatures : plan.entrepriseFeatures
-                return (
-                  <div
-                    key={plan.id}
-                    className={`relative rounded-2xl border bg-slate-900 p-8 flex flex-col ${
-                      plan.popular
-                        ? 'border-emerald-500 shadow-2xl shadow-emerald-500/10'
-                        : plan.accentBorder
-                    }`}
-                  >
-                    {plan.popular && (
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                        <span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full tracking-wide">
-                          POPULAIRE
-                        </span>
-                      </div>
-                    )}
-
-                    {/* Header */}
-                    <div className="mb-6">
-                      <div className={`inline-flex p-3 rounded-xl mb-4 ${plan.iconBg}`}>
-                        {plan.icon}
-                      </div>
-                      <h2 className="text-2xl font-bold text-white">{plan.name}</h2>
-                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">{plan.tagline}</p>
+              {PLANS.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={`relative rounded-2xl border-2 bg-white shadow-sm flex flex-col ${
+                    plan.popular
+                      ? 'border-emerald-400 shadow-xl shadow-emerald-100'
+                      : plan.accentBorder
+                  }`}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                      <span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full tracking-wide shadow">
+                        POPULAIRE
+                      </span>
                     </div>
+                  )}
+
+                  {/* Plan header */}
+                  <div className={`px-8 pt-8 pb-6 rounded-t-2xl ${plan.headerBg}`}>
+                    <div className="flex items-center gap-2 mb-3">
+                      {plan.id === 'starter' && <Users className="w-5 h-5 text-slate-500" />}
+                      {plan.id === 'cabinet' && <Building2 className="w-5 h-5 text-emerald-600" />}
+                      {plan.id === 'pro' && <Zap className="w-5 h-5 text-violet-600" />}
+                      <h2 className="text-xl font-bold text-slate-900">{plan.name}</h2>
+                    </div>
+                    <p className="text-xs text-slate-500 leading-relaxed">{plan.tagline}</p>
 
                     {/* Price */}
-                    <div className="mb-1">
-                      <span className={`text-5xl font-bold ${plan.priceColor}`}>
+                    <div className="mt-4">
+                      <span className={`text-4xl font-bold ${plan.priceColor}`}>
                         {plan.priceAnnual.toLocaleString('fr-FR')}€
                       </span>
-                      <span className="text-slate-400 text-lg ml-1">/an</span>
+                      <span className="text-slate-400 ml-1">/an</span>
                     </div>
-                    <p className="text-sm text-slate-500 mb-7">
-                      soit <span className="font-semibold text-slate-300">{plan.priceMonthly}€/mois</span>
+                    <p className="text-xs text-slate-400 mt-1">
+                      soit <span className="font-semibold text-slate-600">{plan.priceMonthly}€/mois</span>
                     </p>
+                  </div>
 
-                    {/* CTA */}
+                  {/* CTA */}
+                  <div className="px-8 py-5 border-b border-slate-100">
                     <a
                       href={`mailto:contact@finsoft.fr?subject=${encodeURIComponent(plan.mailSubject)}`}
-                      className={`w-full inline-flex items-center justify-center gap-2 font-semibold px-4 py-3 text-sm rounded-xl transition-all duration-200 mb-8 ${plan.ctaClass}`}
+                      className={`w-full inline-flex items-center justify-center gap-2 font-semibold px-4 py-3 text-sm rounded-xl transition-all duration-200 ${plan.ctaClass}`}
                     >
                       {plan.ctaLabel}
                       <ChevronRight className="w-4 h-4" />
                     </a>
+                  </div>
 
-                    {/* Features */}
+                  {/* Features */}
+                  <div className="px-8 py-6">
                     <ul className="space-y-2.5">
-                      {features.map((f, i) => (
+                      {plan.features[mode].map((f, i) => (
                         <FeatureItem key={i} f={f} />
                       ))}
                     </ul>
                   </div>
-                )
-              })}
+                </div>
+              ))}
             </div>
 
-            {/* Guarantees */}
-            <div className="mt-14 flex flex-wrap justify-center gap-6 text-sm text-slate-500">
+            {/* ── Guarantees ─────────────────────────────────────────────────── */}
+            <div className="mt-14 flex flex-wrap justify-center gap-6 text-sm text-slate-400">
               {[
                 'Abonnement annuel renouvelable',
                 'Hébergé en Europe (RGPD)',
@@ -367,12 +376,12 @@ export default function PricingPage() {
               ))}
             </div>
 
-            {/* Cegid roadmap note */}
-            <div className="mt-10 max-w-2xl mx-auto p-4 bg-slate-800/60 border border-slate-700/60 rounded-xl flex items-start gap-3">
-              <Clock className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+            {/* ── Cegid roadmap note ─────────────────────────────────────────── */}
+            <div className="mt-10 max-w-2xl mx-auto p-4 bg-white border border-amber-200 rounded-xl flex items-start gap-3 shadow-sm">
+              <Clock className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-semibold text-white mb-0.5">Cegid Loop — disponible T2 2026</p>
-                <p className="text-slate-400">
+                <p className="font-semibold text-slate-800 mb-0.5">Cegid Loop — disponible T2 2026</p>
+                <p className="text-slate-500">
                   La synchronisation Cegid XRP Flex via OAuth2 est en cours de développement.
                   Les clients Cabinet et Pro y auront accès automatiquement dès sa disponibilité.
                 </p>
