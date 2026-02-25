@@ -1,0 +1,3 @@
+JournalCode|JournalLib|EcritureNum|EcritureDate|CompteNum|CompteLib|CompAuxNum|CompAuxLib|PieceRef|PieceDate|EcritureLib|Debit|Credit|EcritureLet|DateLet|ValidDate|Montantdevise|Idevise
+AC|ACHATS|1|20260115|601000|Achats|||||Facture F001|120.00|0.00|||20260115||
+AC|ACHATS|1|20260115|401000|Fournisseurs|||||Facture F001|0.00|120.00|||20260115||
