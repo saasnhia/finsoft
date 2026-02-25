@@ -42,18 +42,18 @@ export function DepensesChart({ data, loading }: Props) {
   const chartData = data.map(d => ({ ...d, moisLabel: fmtMois(d.mois) }))
 
   return (
-    <div className="rounded-xl border border-slate-700/60 bg-slate-800/60 p-6">
+    <div className="rounded-xl border border-navy-100 bg-white p-6">
       <div className="mb-4">
-        <h3 className="text-sm font-semibold text-white">Dépenses par catégorie PCG — 6 mois</h3>
-        <p className="text-xs text-slate-500 mt-0.5">Factures fournisseurs classées par compte</p>
+        <h3 className="text-sm font-semibold text-navy-900">Dépenses par catégorie PCG — 6 mois</h3>
+        <p className="text-xs text-navy-400 mt-0.5">Factures fournisseurs classées par compte</p>
       </div>
 
       {loading ? (
-        <div className="h-48 bg-slate-700/40 animate-pulse rounded-lg" />
+        <div className="h-48 bg-navy-50 animate-pulse rounded-lg" />
       ) : (
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={chartData} margin={{ top: 4, right: 8, left: 8, bottom: 4 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" />
+            <CartesianGrid strokeDasharray="3 3" stroke="#E2E8F0" />
             <XAxis
               dataKey="moisLabel"
               tick={{ fill: '#64748B', fontSize: 11 }}
@@ -67,8 +67,8 @@ export function DepensesChart({ data, loading }: Props) {
               tickFormatter={v => `${Math.round(v / 1000)}k`}
             />
             <Tooltip
-              contentStyle={{ background: '#0F172A', border: '1px solid #334155', borderRadius: 8, fontSize: 12 }}
-              labelStyle={{ color: '#94A3B8', marginBottom: 4 }}
+              contentStyle={{ background: '#ffffff', border: '1px solid #E2E8F0', borderRadius: 8, fontSize: 12 }}
+              labelStyle={{ color: '#334155', marginBottom: 4 }}
               formatter={(value: number, name: string) => [fmtEur(value), name]}
             />
             <Legend

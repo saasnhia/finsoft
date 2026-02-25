@@ -41,11 +41,11 @@ function typeIcon(type: ImportType) {
 
 function typeBadge(type: ImportType): { label: string; color: string } {
   switch (type) {
-    case 'facture_ocr':    return { label: 'Facture OCR', color: 'bg-violet-900/50 text-violet-300 border-violet-700' }
-    case 'releve_bancaire': return { label: 'Relevé bancaire', color: 'bg-blue-900/50 text-blue-300 border-blue-700' }
-    case 'fec_import':     return { label: 'FEC', color: 'bg-emerald-900/50 text-emerald-300 border-emerald-700' }
-    case 'excel_batch':    return { label: 'Import Excel', color: 'bg-orange-900/50 text-orange-300 border-orange-700' }
-    default:               return { label: 'Inconnu', color: 'bg-slate-800 text-slate-400 border-slate-600' }
+    case 'facture_ocr':    return { label: 'Facture OCR', color: 'bg-violet-100 text-violet-700 border-violet-300' }
+    case 'releve_bancaire': return { label: 'Relevé bancaire', color: 'bg-blue-100 text-blue-700 border-blue-300' }
+    case 'fec_import':     return { label: 'FEC', color: 'bg-emerald-100 text-emerald-700 border-emerald-300' }
+    case 'excel_batch':    return { label: 'Import Excel', color: 'bg-orange-100 text-orange-700 border-orange-300' }
+    default:               return { label: 'Inconnu', color: 'bg-navy-100 text-navy-500 border-navy-200' }
   }
 }
 
@@ -149,8 +149,8 @@ export function UniversalImportHub() {
         <div
           className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-colors ${
             dragActive
-              ? 'border-emerald-400 bg-emerald-950/30'
-              : 'border-slate-600 bg-slate-800/40 hover:border-emerald-500 hover:bg-emerald-950/20'
+              ? 'border-emerald-400 bg-emerald-50'
+              : 'border-navy-200 bg-navy-50 hover:border-emerald-400 hover:bg-emerald-50'
           }`}
           onDragOver={e => { e.preventDefault(); setDragActive(true) }}
           onDragLeave={e => { e.preventDefault(); setDragActive(false) }}
@@ -165,11 +165,11 @@ export function UniversalImportHub() {
             onChange={e => { if (e.target.files?.[0]) handleFile(e.target.files[0]) }}
           />
           <div className="flex flex-col items-center gap-2">
-            <Upload className="w-6 h-6 text-emerald-400" />
-            <span className="text-sm font-medium text-slate-300">
+            <Upload className="w-6 h-6 text-emerald-500" />
+            <span className="text-sm font-medium text-navy-700">
               Glissez ou cliquez pour importer
             </span>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-navy-400">
               PDF, Excel, CSV, FEC, image
             </span>
           </div>
@@ -180,10 +180,10 @@ export function UniversalImportHub() {
 
   if (step === 'detecting') {
     return (
-      <div className="rounded-xl border border-slate-700 bg-slate-800/40 p-5">
-        <div className="flex items-center gap-3 text-sm text-slate-300">
-          <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
-          <span>Analyse de <span className="font-medium text-white">{currentFile?.name}</span>…</span>
+      <div className="rounded-xl border border-navy-200 bg-navy-50 p-5">
+        <div className="flex items-center gap-3 text-sm text-navy-600">
+          <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
+          <span>Analyse de <span className="font-medium text-navy-900">{currentFile?.name}</span>…</span>
         </div>
       </div>
     )
@@ -193,14 +193,14 @@ export function UniversalImportHub() {
     const badge = typeBadge(detection.type)
     const isRedirect = detection.preview.action === 'redirect'
     return (
-      <div className="rounded-xl border border-slate-700 bg-slate-800/40 p-4 space-y-3">
+      <div className="rounded-xl border border-navy-200 bg-navy-50 p-4 space-y-3">
         {/* File + type */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             {typeIcon(detection.type)}
-            <span className="text-sm font-medium text-white truncate">{currentFile?.name}</span>
+            <span className="text-sm font-medium text-navy-900 truncate">{currentFile?.name}</span>
           </div>
-          <button onClick={reset} className="text-slate-500 hover:text-slate-300 flex-shrink-0">
+          <button onClick={reset} className="text-navy-400 hover:text-navy-600 flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -209,15 +209,15 @@ export function UniversalImportHub() {
           <span className={`text-xs px-2 py-0.5 rounded-full border font-medium ${badge.color}`}>
             {badge.label}
           </span>
-          <span className="text-xs text-slate-400">
+          <span className="text-xs text-navy-500">
             confiance {detection.confidence}%
           </span>
         </div>
 
-        <p className="text-xs text-slate-400">{detection.preview.description}</p>
+        <p className="text-xs text-navy-500">{detection.preview.description}</p>
 
         {/* Confidence bar */}
-        <div className="h-1 rounded-full bg-slate-700 overflow-hidden">
+        <div className="h-1 rounded-full bg-navy-200 overflow-hidden">
           <div
             className="h-full rounded-full bg-emerald-500 transition-all"
             style={{ width: `${detection.confidence}%` }}
@@ -234,7 +234,7 @@ export function UniversalImportHub() {
           </button>
           <button
             onClick={reset}
-            className="text-sm px-3 py-1.5 rounded-lg border border-slate-600 text-slate-300 hover:border-slate-400 transition-colors"
+            className="text-sm px-3 py-1.5 rounded-lg border border-navy-200 text-navy-600 hover:border-navy-400 transition-colors"
           >
             Annuler
           </button>
@@ -245,9 +245,9 @@ export function UniversalImportHub() {
 
   if (step === 'processing') {
     return (
-      <div className="rounded-xl border border-slate-700 bg-slate-800/40 p-5">
-        <div className="flex items-center gap-3 text-sm text-slate-300">
-          <Loader2 className="w-4 h-4 animate-spin text-emerald-400" />
+      <div className="rounded-xl border border-navy-200 bg-navy-50 p-5">
+        <div className="flex items-center gap-3 text-sm text-navy-600">
+          <Loader2 className="w-4 h-4 animate-spin text-emerald-500" />
           <span>Traitement en cours…</span>
         </div>
       </div>
@@ -256,30 +256,30 @@ export function UniversalImportHub() {
 
   if (step === 'done' && result) {
     return (
-      <div className="rounded-xl border border-emerald-800 bg-emerald-950/30 p-4 space-y-2">
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 space-y-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-emerald-400">
+          <div className="flex items-center gap-2 text-emerald-600">
             <CheckCircle2 className="w-4 h-4" />
             <span className="text-sm font-medium">Import terminé</span>
           </div>
-          <button onClick={reset} className="text-slate-500 hover:text-slate-300">
+          <button onClick={reset} className="text-navy-400 hover:text-navy-600">
             <X className="w-4 h-4" />
           </button>
         </div>
-        <div className="flex gap-4 text-xs text-slate-400">
-          <span><span className="text-emerald-400 font-semibold">{result.processed_count}</span> importés</span>
+        <div className="flex gap-4 text-xs text-navy-500">
+          <span><span className="text-emerald-600 font-semibold">{result.processed_count}</span> importés</span>
           {result.error_count > 0 && (
-            <span><span className="text-red-400 font-semibold">{result.error_count}</span> erreurs</span>
+            <span><span className="text-red-600 font-semibold">{result.error_count}</span> erreurs</span>
           )}
         </div>
         {result.errors.length > 0 && (
-          <ul className="text-xs text-red-400 space-y-0.5 max-h-20 overflow-y-auto">
+          <ul className="text-xs text-red-600 space-y-0.5 max-h-20 overflow-y-auto">
             {result.errors.map((e, i) => <li key={i}>• {e}</li>)}
           </ul>
         )}
         <button
           onClick={reset}
-          className="text-xs text-emerald-400 hover:text-emerald-300 underline"
+          className="text-xs text-emerald-600 hover:text-emerald-700 underline"
         >
           Importer un autre fichier
         </button>
@@ -289,15 +289,15 @@ export function UniversalImportHub() {
 
   if (step === 'error') {
     return (
-      <div className="rounded-xl border border-red-800 bg-red-950/30 p-4 space-y-2">
-        <div className="flex items-center gap-2 text-red-400">
+      <div className="rounded-xl border border-red-200 bg-red-50 p-4 space-y-2">
+        <div className="flex items-center gap-2 text-red-600">
           <AlertCircle className="w-4 h-4" />
           <span className="text-sm font-medium">Erreur</span>
         </div>
-        <p className="text-xs text-slate-400">{errorMsg}</p>
+        <p className="text-xs text-navy-500">{errorMsg}</p>
         <button
           onClick={reset}
-          className="text-xs text-emerald-400 hover:text-emerald-300 underline"
+          className="text-xs text-emerald-600 hover:text-emerald-700 underline"
         >
           Réessayer
         </button>
