@@ -40,8 +40,9 @@ export function useSubscription(): UseSubscriptionResult {
     setLoading(true)
 
     const fetch = async () => {
+      console.log('[sub fetch] user:', user?.id)
       const supabase = createClient()
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('subscriptions')
         .select('*')
         .eq('user_id', user.id)
@@ -50,6 +51,7 @@ export function useSubscription(): UseSubscriptionResult {
         .limit(1)
         .maybeSingle()
 
+      console.log('[sub result]', { data, error })
       setSubscription(data as Subscription | null)
       setLoading(false)
     }
