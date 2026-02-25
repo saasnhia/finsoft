@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { AppShell } from '@/components/layout'
 import { Card } from '@/components/ui'
 import { ExportFECModal, InsightsPanel, UniversalImportHub, ImportHistoryList } from '@/components/dashboard'
+import { EntrepriseDashboardPanel } from '@/components/entreprise/KpiCards'
 import { useAuth } from '@/hooks/useAuth'
 import {
   Clock,
@@ -440,6 +441,13 @@ export default function DashboardPage() {
             <SimpleKPICard key={i} {...card} />
           ))}
         </div>
+
+        {/* Panel KPIs entreprise enrichis + graphique 6 mois */}
+        {profileType === 'entreprise' && (
+          <div className="mb-8">
+            <EntrepriseDashboardPanel />
+          </div>
+        )}
 
         {/* Row 1: Balance âgée (2/3) + Rapprochements (1/3) */}
         <div className="grid lg:grid-cols-3 gap-6 mb-6">

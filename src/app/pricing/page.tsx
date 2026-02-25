@@ -33,7 +33,8 @@ interface Plan {
   priceColor: string
   ctaClass: string
   ctaLabel: string
-  features: FeatureRow[]
+  cabinetFeatures: FeatureRow[]
+  entrepriseFeatures: FeatureRow[]
   mailSubject: string
 }
 
@@ -54,7 +55,7 @@ const PLANS: Plan[] = [
     ctaClass: 'border border-slate-600 hover:border-slate-400 text-slate-300 hover:text-white',
     ctaLabel: 'Choisir Starter',
     mailSubject: 'Souscription plan Starter FinSoft — 290€/an',
-    features: [
+    cabinetFeatures: [
       { type: 'included', label: '1 utilisateur' },
       { type: 'included', label: '300 factures / an' },
       { type: 'included', label: 'OCR Factures (Mistral IA)' },
@@ -67,9 +68,23 @@ const PLANS: Plan[] = [
       { type: 'locked', label: 'Rapprochement bancaire automatique', requiredPlan: 'Cabinet' },
       { type: 'locked', label: 'Dashboard automatisation & rollback', requiredPlan: 'Cabinet' },
       { type: 'locked', label: 'Synchronisation Sage (Chift)', requiredPlan: 'Cabinet' },
-      { type: 'locked', label: 'Score risque fournisseur (Pappers)', requiredPlan: 'Cabinet' },
       { type: 'locked', label: 'Alertes KPI automatiques', requiredPlan: 'Cabinet' },
       { type: 'locked', label: 'Audit IA', requiredPlan: 'Cabinet' },
+    ],
+    entrepriseFeatures: [
+      { type: 'included', label: '1 utilisateur' },
+      { type: 'included', label: '300 factures / an' },
+      { type: 'included', label: 'OCR Factures (Mistral IA)' },
+      { type: 'included', label: 'Enrichissement SIREN' },
+      { type: 'included', label: 'Import universel (PDF / FEC / CSV / Excel)' },
+      { type: 'included', label: 'Balance âgée' },
+      { type: 'included', label: 'Dashboard KPI entreprise' },
+      { type: 'included', label: 'Support email' },
+      { type: 'locked', label: 'Dépenses par catégorie PCG', requiredPlan: 'Cabinet' },
+      { type: 'locked', label: 'Prévision trésorerie 30/60/90j', requiredPlan: 'Cabinet' },
+      { type: 'locked', label: 'Rapprochement bancaire automatique', requiredPlan: 'Cabinet' },
+      { type: 'locked', label: 'Règles automatiques de catégorisation', requiredPlan: 'Cabinet' },
+      { type: 'locked', label: 'Alertes KPI automatiques', requiredPlan: 'Cabinet' },
     ],
   },
   {
@@ -86,7 +101,7 @@ const PLANS: Plan[] = [
     ctaClass: 'bg-emerald-500 hover:bg-emerald-400 text-white',
     ctaLabel: 'Choisir Cabinet',
     mailSubject: 'Souscription plan Cabinet FinSoft — 890€/an',
-    features: [
+    cabinetFeatures: [
       { type: 'included', label: '10 utilisateurs' },
       { type: 'included', label: 'Factures illimitées' },
       { type: 'included', label: 'OCR + SIREN + VIES + Import universel' },
@@ -98,6 +113,22 @@ const PLANS: Plan[] = [
       { type: 'included', label: 'Alertes KPI automatiques' },
       { type: 'included', label: 'Audit IA' },
       { type: 'soon', label: 'Cegid Loop (OAuth2 XRP Flex)', note: 'T2 2026' },
+      { type: 'included', label: 'Support prioritaire' },
+      { type: 'locked', label: 'API dédiée FinSoft', requiredPlan: 'Pro' },
+      { type: 'locked', label: 'Intégration ERP sur-mesure', requiredPlan: 'Pro' },
+      { type: 'locked', label: 'Support dédié 6h/jour + SLA', requiredPlan: 'Pro' },
+    ],
+    entrepriseFeatures: [
+      { type: 'included', label: '10 utilisateurs' },
+      { type: 'included', label: 'Factures illimitées' },
+      { type: 'included', label: 'OCR + SIREN + VIES + Import universel' },
+      { type: 'included', label: 'Dashboard KPI entreprise (solde, charges, trésorerie)' },
+      { type: 'included', label: 'Dépenses par catégorie PCG (graphique + table)' },
+      { type: 'included', label: 'Prévision trésorerie 30/60/90 jours' },
+      { type: 'included', label: 'Rapprochement bancaire automatique' },
+      { type: 'included', label: 'Règles automatiques de catégorisation' },
+      { type: 'included', label: 'Alertes KPI automatiques' },
+      { type: 'included', label: 'Audit IA' },
       { type: 'included', label: 'Support prioritaire' },
       { type: 'locked', label: 'API dédiée FinSoft', requiredPlan: 'Pro' },
       { type: 'locked', label: 'Intégration ERP sur-mesure', requiredPlan: 'Pro' },
@@ -118,7 +149,7 @@ const PLANS: Plan[] = [
     ctaClass: 'bg-violet-600 hover:bg-violet-500 text-white',
     ctaLabel: 'Contacter l\'équipe',
     mailSubject: 'Souscription plan Pro FinSoft — 1900€/an',
-    features: [
+    cabinetFeatures: [
       { type: 'included', label: 'Utilisateurs illimités' },
       { type: 'included', label: 'Tout illimité + custom' },
       { type: 'included', label: 'Tout le plan Cabinet inclus' },
@@ -127,6 +158,16 @@ const PLANS: Plan[] = [
       { type: 'included', label: 'Support dédié 6h/jour' },
       { type: 'included', label: 'SLA garanti' },
       { type: 'soon', label: 'Cegid Loop inclus', note: 'T2 2026' },
+    ],
+    entrepriseFeatures: [
+      { type: 'included', label: 'Utilisateurs illimités' },
+      { type: 'included', label: 'Tout illimité + custom' },
+      { type: 'included', label: 'Tout le plan Cabinet inclus' },
+      { type: 'included', label: 'API dédiée FinSoft' },
+      { type: 'included', label: 'Intégration ERP sur-mesure' },
+      { type: 'included', label: 'Connexions ERP multiples (Sage, Cegid…)' },
+      { type: 'included', label: 'Support dédié 6h/jour' },
+      { type: 'included', label: 'SLA garanti' },
     ],
   },
 ]
@@ -168,8 +209,11 @@ function FeatureItem({ f }: { f: FeatureRow }) {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+type ProfileMode = 'cabinet' | 'entreprise'
+
 export default function PricingPage() {
   const [subscriptionRequired, setSubscriptionRequired] = useState(false)
+  const [mode, setMode] = useState<ProfileMode>('cabinet')
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -199,7 +243,7 @@ export default function PricingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             {/* Heading */}
-            <div className="text-center mb-16">
+            <div className="text-center mb-10">
               <h1 className="text-3xl md:text-5xl font-bold text-white">
                 Tarifs FinSoft
               </h1>
@@ -212,62 +256,100 @@ export default function PricingPage() {
               </div>
             </div>
 
-            {/* Plans */}
-            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto items-start">
-              {PLANS.map((plan) => (
-                <div
-                  key={plan.id}
-                  className={`relative rounded-2xl border bg-slate-900 p-8 flex flex-col ${
-                    plan.popular
-                      ? 'border-emerald-500 shadow-2xl shadow-emerald-500/10'
-                      : plan.accentBorder
+            {/* Toggle Cabinet / Entreprise */}
+            <div className="flex justify-center mb-12">
+              <div className="flex items-center gap-1 p-1 bg-slate-800 border border-slate-700 rounded-xl">
+                <button
+                  onClick={() => setMode('cabinet')}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                    mode === 'cabinet'
+                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                      : 'text-slate-400 hover:text-white'
                   }`}
                 >
-                  {plan.popular && (
-                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                      <span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full tracking-wide">
-                        POPULAIRE
-                      </span>
-                    </div>
-                  )}
+                  <Building2 className="w-4 h-4" />
+                  Cabinet comptable
+                </button>
+                <button
+                  onClick={() => setMode('entreprise')}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                    mode === 'entreprise'
+                      ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Zap className="w-4 h-4" />
+                  Mon entreprise
+                </button>
+              </div>
+            </div>
 
-                  {/* Header */}
-                  <div className="mb-6">
-                    <div className={`inline-flex p-3 rounded-xl mb-4 ${plan.iconBg}`}>
-                      {plan.icon}
-                    </div>
-                    <h2 className="text-2xl font-bold text-white">{plan.name}</h2>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed">{plan.tagline}</p>
-                  </div>
+            {/* Mode subtitle */}
+            <p className="text-center text-sm text-slate-500 -mt-8 mb-12">
+              {mode === 'cabinet'
+                ? 'Fonctionnalités pour les cabinets comptables et leurs dossiers clients'
+                : 'Fonctionnalités pour la gestion comptable interne d\'une entreprise'}
+            </p>
 
-                  {/* Price */}
-                  <div className="mb-1">
-                    <span className={`text-5xl font-bold ${plan.priceColor}`}>
-                      {plan.priceAnnual.toLocaleString('fr-FR')}€
-                    </span>
-                    <span className="text-slate-400 text-lg ml-1">/an</span>
-                  </div>
-                  <p className="text-sm text-slate-500 mb-7">
-                    soit <span className="font-semibold text-slate-300">{plan.priceMonthly}€/mois</span>
-                  </p>
-
-                  {/* CTA */}
-                  <a
-                    href={`mailto:contact@finsoft.fr?subject=${encodeURIComponent(plan.mailSubject)}`}
-                    className={`w-full inline-flex items-center justify-center gap-2 font-semibold px-4 py-3 text-sm rounded-xl transition-all duration-200 mb-8 ${plan.ctaClass}`}
+            {/* Plans */}
+            <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto items-start">
+              {PLANS.map((plan) => {
+                const features = mode === 'cabinet' ? plan.cabinetFeatures : plan.entrepriseFeatures
+                return (
+                  <div
+                    key={plan.id}
+                    className={`relative rounded-2xl border bg-slate-900 p-8 flex flex-col ${
+                      plan.popular
+                        ? 'border-emerald-500 shadow-2xl shadow-emerald-500/10'
+                        : plan.accentBorder
+                    }`}
                   >
-                    {plan.ctaLabel}
-                    <ChevronRight className="w-4 h-4" />
-                  </a>
+                    {plan.popular && (
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                        <span className="bg-emerald-500 text-white text-xs font-bold px-4 py-1 rounded-full tracking-wide">
+                          POPULAIRE
+                        </span>
+                      </div>
+                    )}
 
-                  {/* Features */}
-                  <ul className="space-y-2.5">
-                    {plan.features.map((f, i) => (
-                      <FeatureItem key={i} f={f} />
-                    ))}
-                  </ul>
-                </div>
-              ))}
+                    {/* Header */}
+                    <div className="mb-6">
+                      <div className={`inline-flex p-3 rounded-xl mb-4 ${plan.iconBg}`}>
+                        {plan.icon}
+                      </div>
+                      <h2 className="text-2xl font-bold text-white">{plan.name}</h2>
+                      <p className="text-xs text-slate-500 mt-1 leading-relaxed">{plan.tagline}</p>
+                    </div>
+
+                    {/* Price */}
+                    <div className="mb-1">
+                      <span className={`text-5xl font-bold ${plan.priceColor}`}>
+                        {plan.priceAnnual.toLocaleString('fr-FR')}€
+                      </span>
+                      <span className="text-slate-400 text-lg ml-1">/an</span>
+                    </div>
+                    <p className="text-sm text-slate-500 mb-7">
+                      soit <span className="font-semibold text-slate-300">{plan.priceMonthly}€/mois</span>
+                    </p>
+
+                    {/* CTA */}
+                    <a
+                      href={`mailto:contact@finsoft.fr?subject=${encodeURIComponent(plan.mailSubject)}`}
+                      className={`w-full inline-flex items-center justify-center gap-2 font-semibold px-4 py-3 text-sm rounded-xl transition-all duration-200 mb-8 ${plan.ctaClass}`}
+                    >
+                      {plan.ctaLabel}
+                      <ChevronRight className="w-4 h-4" />
+                    </a>
+
+                    {/* Features */}
+                    <ul className="space-y-2.5">
+                      {features.map((f, i) => (
+                        <FeatureItem key={i} f={f} />
+                      ))}
+                    </ul>
+                  </div>
+                )
+              })}
             </div>
 
             {/* Guarantees */}

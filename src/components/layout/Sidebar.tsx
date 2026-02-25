@@ -30,8 +30,11 @@ import {
   BarChart3,
   Wand2,
   Zap,
+  Landmark,
+  PieChart,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { createClient } from '@/lib/supabase/client'
 
 interface SidebarSection {
   label: string
@@ -96,6 +99,7 @@ export function Sidebar() {
   const { user } = useAuth()
   const [openSections, setOpenSections] = useState<Set<string>>(new Set(['Comptabilité', 'Audit']))
   const [overdueCount, setOverdueCount] = useState(0)
+  const [profileType, setProfileType] = useState<'cabinet' | 'entreprise'>('cabinet')
 
   // Fetch overdue count for notification badge
   useEffect(() => {
@@ -112,6 +116,23 @@ export function Sidebar() {
     fetchCount()
     const interval = setInterval(fetchCount, 5 * 60 * 1000)
     return () => clearInterval(interval)
+  }, [user?.id])
+
+  // Fetch profile_type to show/hide enterprise section
+  useEffect(() => {
+    if (!user?.id) return
+    const fetchProfile = async () => {
+      try {
+        const supabase = createClient()
+        const { data } = await supabase
+          .from('user_profiles')
+          .select('profile_type')
+          .eq('id', user.id)
+          .single()
+        if (data?.profile_type) setProfileType(data.profile_type as 'cabinet' | 'entreprise')
+      } catch { /* silent */ }
+    }
+    fetchProfile()
   }, [user?.id])
 
   const toggleSection = (label: string) => {
@@ -157,6 +178,54 @@ export function Sidebar() {
 
       {/* Sections */}
       <div className="flex-1 px-3 py-2 space-y-1">
+        {/* Mon entreprise — visible uniquement en mode entreprise */}
+        {profileType === 'entreprise' && (
+          <div>
+            <button
+              onClick={() => toggleSection('Mon entreprise')}
+              className={`
+                w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors
+                ${['/entreprise/depenses', '/entreprise/tresorerie'].some(h => pathname === h)
+                  ? 'text-brand-green-action'
+                  : 'text-neutral-500 hover:text-neutral-300'}
+              `}
+            >
+              <div className="flex items-center gap-2">
+                <Landmark className="w-3.5 h-3.5" />
+                Mon entreprise
+              </div>
+              <ChevronDown className={`w-3 h-3 transition-transform duration-200 ${openSections.has('Mon entreprise') ? 'rotate-180' : ''}`} />
+            </button>
+
+            {openSections.has('Mon entreprise') && (
+              <div className="ml-2 space-y-0.5 mt-0.5">
+                {[
+                  { name: 'Dépenses', href: '/entreprise/depenses', icon: PieChart },
+                  { name: 'Trésorerie', href: '/entreprise/tresorerie', icon: Landmark },
+                ].map(item => {
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`
+                        flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[13px] transition-colors
+                        ${isActive
+                          ? 'bg-brand-green-primary/10 text-brand-green-action font-medium'
+                          : 'text-neutral-400 hover:bg-white/5 hover:text-neutral-200'
+                        }
+                      `}
+                    >
+                      <item.icon className="w-3.5 h-3.5 flex-shrink-0" />
+                      {item.name}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {sections.map((section) => {
           const isOpen = openSections.has(section.label)
           const hasActiveChild = section.items.some(i => pathname === i.href)
