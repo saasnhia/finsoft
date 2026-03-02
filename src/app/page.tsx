@@ -4,120 +4,30 @@ import { useState } from 'react'
 import Link from 'next/link'
 import {
   CheckCircle2, X, ChevronDown, ArrowRight, ScanLine, ArrowRightLeft,
-  BookOpen, Users2, Bell, Menu, Shield, Zap, Globe, Building2, RefreshCw,
+  BookOpen, Users2, Bell, Menu, Shield, Zap, Globe, Building2,
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────
-// DATA
+// DATA (inchangé sauf TEMOIGNAGES et PLANS)
 // ─────────────────────────────────────────────────────────────
-
-const FEATURES = [
-  {
-    icon: ScanLine,
-    title: 'OCR & capture automatique',
-    desc: 'Photographiez une facture, FinSoft la lit, l\'extrait et la classe automatiquement. Plus de saisie manuelle.',
-    color: 'bg-emerald-50 text-emerald-600',
-  },
-  {
-    icon: ArrowRightLeft,
-    title: 'Rapprochement bancaire IA',
-    desc: 'Associez vos relevés bancaires à vos factures en un clic. Notre IA apprend vos habitudes et s\'améliore.',
-    color: 'bg-blue-50 text-blue-600',
-  },
-  {
-    icon: BookOpen,
-    title: 'PCG & BOFIP intégrés',
-    desc: 'Plan Comptable Général et références fiscales BOFIP accessibles dans l\'assistant IA, contextualisés à votre dossier.',
-    color: 'bg-violet-50 text-violet-600',
-  },
-  {
-    icon: Users2,
-    title: 'Portail client',
-    desc: 'Partagez un espace sécurisé avec vos clients pour l\'échange de documents. Zéro email, zéro pièce jointe perdue.',
-    color: 'bg-amber-50 text-amber-600',
-  },
-  {
-    icon: Bell,
-    title: 'Relances automatiques',
-    desc: 'Détectez les impayés et envoyez des relances personnalisées par email. Réduisez vos délais de paiement de 40%.',
-    color: 'bg-rose-50 text-rose-600',
-  },
-]
 
 const COMPARISON = [
   { critere: 'OCR natif + IA', finsoft: true, pennylane: true, dext: true, sage: false },
   { critere: 'Portail client intégré', finsoft: true, pennylane: false, dext: false, sage: false },
   { critere: 'PCG / BOFIP assistant', finsoft: true, pennylane: false, dext: false, sage: false },
   { critere: 'Gestion commerciale (devis, BC…)', finsoft: true, pennylane: true, dext: false, sage: true },
-  { critere: 'Hébergé en France (HDS)', finsoft: true, pennylane: false, dext: false, sage: false },
-]
-
-const PLANS = [
-  {
-    name: 'Starter',
-    priceMonthly: 0,
-    priceAnnual: 0,
-    desc: 'Pour démarrer et tester',
-    cta: 'Démarrer gratuitement',
-    ctaHref: '/auth/register',
-    featured: false,
-    features: ['300 factures / an', 'OCR basique', 'Dashboard KPI', 'Import relevé bancaire', '1 utilisateur'],
-  },
-  {
-    name: 'Standard',
-    priceMonthly: 29,
-    priceAnnual: 23,
-    desc: 'Pour les PME et indépendants',
-    cta: 'Essai 14 jours gratuit',
-    ctaHref: '/auth/register?plan=standard',
-    featured: true,
-    features: ['Factures illimitées', 'OCR + IA avancée', 'Rapprochement automatique', 'Relances automatiques', 'Gestion commerciale', '3 utilisateurs'],
-  },
-  {
-    name: 'Cabinet',
-    priceMonthly: 89,
-    priceAnnual: 71,
-    desc: 'Pour les experts-comptables',
-    cta: "Contacter l'équipe",
-    ctaHref: '#contact-cabinet',
-    featured: false,
-    features: ['Multi-dossiers illimités', 'Portail clients', 'PCG & BOFIP assistant IA', 'E-invoicing 2026', 'Intégrations Cegid / Sage', 'Utilisateurs illimités'],
-  },
-]
-
-const TEMOIGNAGES = [
-  {
-    nom: 'Marie-Claire Fontaine',
-    role: 'Expert-comptable — Cabinet Fontaine & Associés, Paris 8e',
-    texte: 'FinSoft nous a fait gagner 2h par dossier client. Le rapprochement automatique et le portail client ont transformé notre façon de travailler.',
-    initiales: 'MF',
-    color: 'bg-emerald-100 text-emerald-700',
-  },
-  {
-    nom: 'Thomas Renard',
-    role: 'DAF — Groupe Renard Distribution, Lyon',
-    texte: "L'OCR est bluffant. On traite 400 factures fournisseurs par mois sans saisie manuelle. L'intégration avec notre Sage a été simple.",
-    initiales: 'TR',
-    color: 'bg-blue-100 text-blue-700',
-  },
-  {
-    nom: 'Sophie Aubry',
-    role: 'Consultante indépendante, Bordeaux',
-    texte: 'Je gère seule ma comptabilité. FinSoft m\'alerte sur les impayés, envoie les relances et je signe mes devis en 2 clics. Parfait.',
-    initiales: 'SA',
-    color: 'bg-violet-100 text-violet-700',
-  },
+  { critere: 'Hébergé en France', finsoft: true, pennylane: false, dext: false, sage: false },
 ]
 
 const FAQ_ITEMS = [
-  { q: 'FinSoft est-il conforme RGPD ?', r: 'Oui. Toutes vos données sont hébergées en France sur des serveurs certifiés HDS. Aucune donnée n\'est transmise à des tiers sans votre consentement.' },
-  { q: 'Puis-je importer mes données depuis Sage ou Cegid ?', r: 'Oui. FinSoft dispose d\'une intégration native avec Cegid Loop et Sage via Chift. L\'import FEC est également supporté pour la reprise de l\'historique.' },
-  { q: "Comment fonctionne la période d'essai ?", r: '14 jours sans engagement, sans carte bancaire. Vous accédez à toutes les fonctionnalités du plan Standard pendant l\'essai.' },
+  { q: 'FinSoft est-il conforme RGPD ?', r: "Oui. Toutes vos données sont hébergées en France. Aucune donnée n'est transmise à des tiers sans votre consentement. FinSoft est conforme au RGPD (Règlement Général sur la Protection des Données)." },
+  { q: 'Puis-je importer mes données depuis Sage ou Cegid ?', r: "Oui. FinSoft dispose d'une intégration native avec Cegid Loop et Sage via Chift. L'import FEC est également supporté pour la reprise de l'historique." },
+  { q: "Comment fonctionne la période d'essai ?", r: "14 jours sans engagement, sans carte bancaire. Vous accédez à toutes les fonctionnalités du plan Pro pendant l'essai." },
   { q: "L'OCR supporte-t-il toutes les factures ?", r: 'Notre moteur OCR traite les factures PDF, JPEG et PNG, même scannées. Il est entraîné sur des milliers de factures françaises et européennes.' },
   { q: "Qu'est-ce que l'e-invoicing 2026 ?", r: 'À partir de 2026, la facturation électronique sera obligatoire entre entreprises françaises. FinSoft vous prépare dès maintenant à cette transition avec le format Factur-X.' },
-  { q: "Combien d'utilisateurs peut-on ajouter ?", r: 'Le plan Starter inclut 1 utilisateur, Standard 3, Cabinet illimité. Des utilisateurs supplémentaires peuvent être ajoutés à la carte.' },
-  { q: 'Le rapprochement bancaire est-il automatique ?', r: 'Oui. Importez votre relevé bancaire (CSV, OFX) et FinSoft suggère automatiquement les correspondances avec vos factures. Vous validez en un clic.' },
-  { q: "Puis-je annuler mon abonnement à tout moment ?", r: 'Absolument. Pas d\'engagement, pas de frais de résiliation. Vous pouvez exporter vos données à tout moment au format standard.' },
+  { q: "Combien d'utilisateurs peut-on ajouter ?", r: "Le plan Starter inclut 1 utilisateur, Pro de 1 à 15 selon le tier, Premium illimité. Des licences supplémentaires sont disponibles à la carte." },
+  { q: 'Le rapprochement bancaire est-il automatique ?', r: "Oui. Importez votre relevé bancaire (CSV, OFX) et FinSoft suggère automatiquement les correspondances avec vos factures. Vous validez en un clic." },
+  { q: "Puis-je annuler mon abonnement à tout moment ?", r: "Absolument. Pas d'engagement, pas de frais de résiliation. Vous pouvez exporter vos données à tout moment au format standard (FEC, CSV, PDF)." },
 ]
 
 // ─────────────────────────────────────────────────────────────
@@ -126,6 +36,7 @@ const FAQ_ITEMS = [
 
 export default function HomePage() {
   const [annual, setAnnual] = useState(false)
+  const [proTier, setProTier] = useState(0)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [mobileMenu, setMobileMenu] = useState(false)
   const [contactForm, setContactForm] = useState({ nom: '', cabinet: '', email: '', message: '' })
@@ -144,6 +55,139 @@ export default function HomePage() {
       setSent(true)
     } catch { /* silent */ } finally { setSending(false) }
   }
+
+  // ── Pricing data ──
+  const PRO_TIERS = [
+    { label: 'Indépendant', sub: '1 utilisateur', monthly: 19, annual: 190 },
+    { label: 'TPE', sub: '1–5 utilisateurs', monthly: 39, annual: 390 },
+    { label: 'PME', sub: '6–15 utilisateurs', monthly: 79, annual: 790 },
+  ]
+  const proMonthly = PRO_TIERS[proTier].monthly
+  const proAnnual = Math.round(PRO_TIERS[proTier].annual / 12)
+  const premiumMonthly = 89
+  const premiumAnnual = 71
+
+  // ── Feature mockups ──
+  const FEATURES = [
+    {
+      icon: ScanLine,
+      title: 'OCR & capture automatique',
+      desc: "Photographiez une facture, FinSoft la lit, l'extrait et la classe automatiquement. Plus de saisie manuelle.",
+      color: 'bg-emerald-50 text-emerald-600',
+      mockup: (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 font-mono text-xs space-y-1">
+          <div className="flex items-center justify-between mb-3">
+            <span className="font-semibold text-slate-700 not-italic">Facture analysée</span>
+            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✓ 100% confiance</span>
+          </div>
+          {[
+            { label: 'Fournisseur', value: 'OFFICE DEPOT' },
+            { label: 'Date', value: '28/02/2026' },
+            { label: 'Montant HT', value: '240,00 €' },
+            { label: 'TVA 20%', value: '48,00 €' },
+            { label: 'Total TTC', value: '288,00 €' },
+          ].map(row => (
+            <div key={row.label} className="flex justify-between py-1.5 border-b border-gray-100 last:border-0">
+              <span className="text-slate-400">{row.label}</span>
+              <span className="font-semibold text-slate-800">{row.value}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      icon: ArrowRightLeft,
+      title: 'Rapprochement bancaire IA',
+      desc: "Associez vos relevés bancaires à vos factures en un clic. Notre IA apprend vos habitudes et s'améliore.",
+      color: 'bg-blue-50 text-blue-600',
+      mockup: (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-xs space-y-1">
+          <p className="font-semibold text-slate-600 mb-3">Transactions — 28/02/2026</p>
+          {[
+            { desc: 'OFFICE DEPOT', amount: '−288,00 €', status: '✓ Matchée', sc: 'bg-emerald-100 text-emerald-700' },
+            { desc: 'TOTAL ENERGIES', amount: '−156,00 €', status: '✓ Matchée', sc: 'bg-emerald-100 text-emerald-700' },
+            { desc: 'Virement entrant', amount: '+4 800,00 €', status: '⚠ À rapprocher', sc: 'bg-amber-100 text-amber-700' },
+          ].map((t, i) => (
+            <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
+              <span className="text-slate-700 font-medium">{t.desc}</span>
+              <div className="flex items-center gap-2">
+                <span className="font-mono font-semibold text-slate-800">{t.amount}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${t.sc}`}>{t.status}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      icon: BookOpen,
+      title: 'PCG & BOFIP intégrés',
+      desc: "Plan Comptable Général et références fiscales BOFIP accessibles dans l'assistant IA, contextualisés à votre dossier.",
+      color: 'bg-violet-50 text-violet-600',
+      mockup: (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-xs space-y-3">
+          <div className="flex items-start gap-2">
+            <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-[10px]">👤</div>
+            <div className="bg-slate-100 rounded-xl rounded-tl-none px-3 py-2 text-slate-700 max-w-[80%]">
+              Quel compte pour une immobilisation ?
+            </div>
+          </div>
+          <div className="flex items-start gap-2 flex-row-reverse">
+            <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 text-[10px] text-white font-bold">FS</div>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl rounded-tr-none px-3 py-2 text-slate-700 max-w-[85%]">
+              <span className="font-bold text-emerald-700">Compte 2154</span> — Matériel industriel<br />
+              <span className="text-slate-400 text-[10px]">PCG art. 212-1 · Amortissable sur 5 ans</span>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      icon: Users2,
+      title: 'Portail client',
+      desc: "Partagez un espace sécurisé avec vos clients pour l'échange de documents. Zéro email, zéro pièce jointe perdue.",
+      color: 'bg-amber-50 text-amber-600',
+      mockup: (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-xs space-y-1">
+          <p className="font-semibold text-slate-600 mb-3">Documents — Cabinet Moreau</p>
+          {[
+            { name: 'Bilan 2025.pdf', status: 'Traité ✓', sc: 'text-emerald-600' },
+            { name: 'Relevé mars 2026.pdf', status: 'Déposé ✓', sc: 'text-emerald-600' },
+            { name: 'Factures fournisseurs.zip', status: 'En attente ⏳', sc: 'text-amber-600' },
+            { name: 'Liasse fiscale 2035.pdf', status: 'En attente ⏳', sc: 'text-amber-600' },
+          ].map((doc, i) => (
+            <div key={i} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
+              <span className="text-slate-700 truncate max-w-[160px]">{doc.name}</span>
+              <span className={`font-medium flex-shrink-0 ${doc.sc}`}>{doc.status}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      icon: Bell,
+      title: 'Relances automatiques',
+      desc: "Détectez les impayés et envoyez des relances personnalisées par email. Réduisez vos délais de paiement de 40%.",
+      color: 'bg-rose-50 text-rose-600',
+      mockup: (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-xs space-y-3">
+          <p className="font-semibold text-slate-600 mb-1">Suivi — Facture #FAC-2026-041</p>
+          {[
+            { day: 'J+7', label: 'Relance 1 envoyée', icon: '✓', dot: 'bg-emerald-500' },
+            { day: 'J+15', label: 'Relance 2 programmée', icon: '📅', dot: 'bg-blue-400' },
+            { day: 'J+30', label: 'Mise en demeure', icon: '🔴', dot: 'bg-gray-200' },
+          ].map((step, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${step.dot}`} />
+              <span className="font-mono text-slate-400 w-8">{step.day}</span>
+              <span className="text-slate-700 flex-1">{step.label}</span>
+              <span>{step.icon}</span>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  ]
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -227,7 +271,7 @@ export default function HomePage() {
             </a>
           </div>
 
-          {/* Badges confiance */}
+          {/* Badges confiance — CORRECTION #6 : "RGPD compliant" */}
           <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
             <div className="flex items-center gap-1.5">
               <span className="text-base">🇫🇷</span>
@@ -236,7 +280,7 @@ export default function HomePage() {
             <div className="w-px h-4 bg-gray-200 hidden sm:block" />
             <div className="flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5 text-emerald-500" />
-              RGPD &amp; HDS certifié
+              RGPD compliant
             </div>
             <div className="w-px h-4 bg-gray-200 hidden sm:block" />
             <div className="flex items-center gap-1.5">
@@ -282,26 +326,44 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── LOGOS CLIENTS ── */}
-      <section className="border-y border-gray-100 py-10 px-4 bg-gray-50">
+      {/* ── SECTION #1 : IAE DIJON (remplace logos fictifs) ── */}
+      <section className="border-y border-gray-100 py-14 px-4 bg-white">
         <div className="max-w-5xl mx-auto">
           <p className="text-center text-xs font-semibold text-slate-400 uppercase tracking-widest mb-8">
-            Ils font confiance à FinSoft
+            Référence académique &amp; validation
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 opacity-60">
-            {['Cabinet Moreau', 'Expertise & Co', 'ASET Conseil', 'Fiduciaire Martin', 'GDC Partners', 'Audit Alliance'].map(n => (
-              <div key={n} className="flex items-center gap-2 font-semibold text-slate-700 text-sm">
-                <div className="w-6 h-6 rounded bg-emerald-500/20 flex items-center justify-center">
-                  <Building2 className="w-3.5 h-3.5 text-emerald-600" />
-                </div>
-                {n}
+
+          {/* Badge principal IAE */}
+          <div className="flex justify-center mb-8">
+            <div className="flex items-start gap-5 bg-emerald-50 border border-emerald-200 rounded-2xl px-7 py-5 max-w-2xl">
+              <div className="text-4xl flex-shrink-0">🎓</div>
+              <div>
+                <p className="font-bold text-slate-900 text-base">Validé par l&apos;IAE Dijon</p>
+                <p className="text-sm text-slate-600 mt-1 leading-relaxed">
+                  Développé et validé par des étudiants et professeurs en comptabilité de l&apos;IAE Dijon —
+                  Institut d&apos;Administration des Entreprises (Université de Bourgogne)
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 3 badges supplémentaires */}
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {[
+              { icon: '📚', text: 'Corpus PCG & BOFIP intégré' },
+              { icon: '🏛️', text: 'Encadré par des experts-comptables diplômés' },
+              { icon: '🎯', text: 'Testé sur 45 dossiers réels en cabinet' },
+            ].map(badge => (
+              <div key={badge.text} className="flex items-center gap-2.5 bg-white border border-gray-200 rounded-xl px-4 py-3 shadow-sm text-sm text-slate-700">
+                <span className="text-lg">{badge.icon}</span>
+                <span className="font-medium">{badge.text}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
+      {/* ── FEATURES avec vrais mockups ── */}
       <section id="features" className="py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
@@ -320,9 +382,10 @@ export default function HomePage() {
                   <p className="text-slate-500 leading-relaxed text-base">{f.desc}</p>
                 </div>
                 <div className="flex-1 w-full lg:w-auto">
-                  <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border border-gray-200 aspect-video flex items-center justify-center">
-                    <div className={`w-16 h-16 rounded-2xl ${f.color} flex items-center justify-center opacity-40`}>
-                      <f.icon className="w-8 h-8" />
+                  {/* Vrai mockup HTML/CSS */}
+                  <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border border-gray-200 p-6 flex items-center justify-center" style={{ minHeight: '200px' }}>
+                    <div className="w-full max-w-sm">
+                      {f.mockup}
                     </div>
                   </div>
                 </div>
@@ -366,7 +429,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── PRICING ── */}
+      {/* ── PRICING #2 : Pennylane-style ── */}
       <section id="pricing" className="py-24 px-4">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
@@ -385,40 +448,187 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {PLANS.map(plan => {
-              const price = annual ? plan.priceAnnual : plan.priceMonthly
-              return (
-                <div key={plan.name} className={`rounded-2xl border p-6 relative flex flex-col ${plan.featured ? 'border-emerald-400 shadow-lg shadow-emerald-500/10 bg-white' : 'border-gray-200 bg-white'}`}>
-                  {plan.featured && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">Recommandé</span>
-                    </div>
-                  )}
-                  <div className="mb-6">
-                    <h3 className="text-lg font-bold text-slate-900 mb-1">{plan.name}</h3>
-                    <p className="text-xs text-slate-500 mb-4">{plan.desc}</p>
-                    <div className="flex items-end gap-1">
-                      <span className="text-4xl font-extrabold text-slate-900">{price === 0 ? 'Gratuit' : `${price}€`}</span>
-                      {price > 0 && <span className="text-slate-400 text-sm mb-1">/mois</span>}
-                    </div>
-                    {annual && price > 0 && <p className="text-xs text-emerald-600 mt-1">Facturé {price * 12}€/an</p>}
-                  </div>
-                  <ul className="space-y-2.5 mb-8 flex-1">
-                    {plan.features.map(f => (
-                      <li key={f} className="flex items-start gap-2.5 text-sm text-slate-700">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                  <a href={plan.ctaHref}
-                    className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-colors ${plan.featured ? 'bg-emerald-500 text-white hover:bg-emerald-600 shadow-sm' : 'border border-gray-200 text-slate-700 hover:bg-gray-50'}`}>
-                    {plan.cta}
-                  </a>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+
+            {/* ── Plan Starter ── */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 flex flex-col">
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-1">Starter</h3>
+                <p className="text-xs text-slate-500 mb-4">Pour découvrir FinSoft sans engagement</p>
+                <div className="flex items-end gap-1">
+                  <span className="text-4xl font-extrabold text-slate-900">Gratuit</span>
                 </div>
-              )
-            })}
+                <p className="text-xs text-slate-400 mt-1">Essai 14 jours, puis 0€/mois</p>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">Limites</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {['1 utilisateur', '30 factures/mois', 'Sans CB'].map(l => (
+                    <span key={l} className="px-2 py-1 bg-gray-100 text-slate-600 text-[11px] rounded-lg font-medium">{l}</span>
+                  ))}
+                </div>
+              </div>
+
+              <ul className="space-y-2 mb-6 flex-1 text-sm">
+                {[
+                  { text: 'Tableau de bord KPIs', ok: true },
+                  { text: 'Import & OCR basique (30 docs/mois)', ok: true },
+                  { text: 'Synchronisation 1 compte bancaire', ok: true },
+                  { text: 'Facturation simple (devis + factures)', ok: true },
+                  { text: 'Support email', ok: true },
+                  { text: 'Rapprochement automatique', ok: false },
+                  { text: 'Agents IA', ok: false },
+                  { text: 'Portail client', ok: false },
+                ].map(f => (
+                  <li key={f.text} className={`flex items-start gap-2.5 ${f.ok ? 'text-slate-700' : 'text-slate-400'}`}>
+                    {f.ok
+                      ? <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                      : <X className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" />}
+                    {f.text}
+                  </li>
+                ))}
+              </ul>
+
+              <a href="/auth/register"
+                className="block text-center py-3 px-4 rounded-xl font-semibold text-sm border border-gray-200 text-slate-700 hover:bg-gray-50 transition-colors">
+                Démarrer gratuitement
+              </a>
+              <p className="text-center text-xs text-slate-400 mt-2">Aucune carte bancaire requise</p>
+            </div>
+
+            {/* ── Plan Pro ── */}
+            <div className="rounded-2xl border-2 border-emerald-400 bg-white p-6 relative flex flex-col shadow-lg shadow-emerald-500/10">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex gap-2">
+                <span className="px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full">Recommandé</span>
+                <span className="px-3 py-1 bg-slate-800 text-white text-xs font-bold rounded-full">Le plus populaire</span>
+              </div>
+
+              <div className="mb-4">
+                <h3 className="text-lg font-bold text-slate-900 mb-1">Pro</h3>
+                <p className="text-xs text-slate-500 mb-4">Pour les indépendants et petites entreprises</p>
+
+                {/* Tier selector */}
+                <div className="flex gap-1 p-1 bg-gray-100 rounded-xl mb-4">
+                  {PRO_TIERS.map((tier, idx) => (
+                    <button key={tier.label} onClick={() => setProTier(idx)}
+                      className={`flex-1 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors leading-tight text-center ${proTier === idx ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>
+                      {tier.label}<br />
+                      <span className="font-normal text-[10px] text-slate-400">{tier.sub}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex items-end gap-1">
+                  <span className="text-4xl font-extrabold text-slate-900">
+                    {annual ? proAnnual : proMonthly}€
+                  </span>
+                  <span className="text-slate-400 text-sm mb-1">/mois</span>
+                </div>
+                {annual && <p className="text-xs text-emerald-600 mt-1">Facturé {PRO_TIERS[proTier].annual}€/an</p>}
+              </div>
+
+              <ul className="space-y-2 mb-6 flex-1 text-sm">
+                {[
+                  'Tout le plan Starter',
+                  'OCR + enrichissement SIREN illimité',
+                  'Rapprochement bancaire automatique IA',
+                  'Gestion commerciale complète (devis, BC, BL, avoirs)',
+                  'TVA CA3 automatique',
+                  'Relances automatiques impayés',
+                  'Import relevés bancaires illimités',
+                  'Catégorisation automatique transactions',
+                  'Export FEC',
+                  'Support chat prioritaire',
+                ].map(f => (
+                  <li key={f} className="flex items-start gap-2.5 text-slate-700">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    {f}
+                  </li>
+                ))}
+                {[
+                  'Agents IA custom',
+                  'Portail client cabinet',
+                  'Liasses fiscales',
+                ].map(f => (
+                  <li key={f} className="flex items-start gap-2.5 text-slate-400">
+                    <X className="w-4 h-4 text-gray-300 flex-shrink-0 mt-0.5" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <a href="/auth/register?plan=pro"
+                className="block text-center py-3 px-4 rounded-xl font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-colors shadow-sm">
+                Essai gratuit 14 jours
+              </a>
+            </div>
+
+            {/* ── Plan Premium ── */}
+            <div className="rounded-2xl border border-gray-200 bg-white p-6 flex flex-col">
+              <div className="mb-6">
+                <h3 className="text-lg font-bold text-slate-900 mb-1">Premium</h3>
+                <p className="text-xs text-slate-500 mb-4">Idéal pour les cabinets d&apos;expertise comptable et d&apos;audit</p>
+
+                <div className="flex items-end gap-1">
+                  <span className="text-4xl font-extrabold text-slate-900">
+                    {annual ? premiumAnnual : premiumMonthly}€
+                  </span>
+                  <span className="text-slate-400 text-sm mb-1">/mois</span>
+                </div>
+                <p className="text-xs text-slate-400 mt-1">Jusqu&apos;à 10 utilisateurs</p>
+                {annual && <p className="text-xs text-emerald-600 mt-0.5">Facturé {premiumAnnual * 12}€/an</p>}
+                <a href="#contact-cabinet" className="inline-flex items-center gap-1 text-xs text-emerald-600 hover:underline mt-2 font-medium">
+                  Plus de 10 users ? Devis sur mesure →
+                </a>
+              </div>
+
+              <ul className="space-y-2 mb-6 flex-1 text-sm">
+                {[
+                  'Tout le plan Pro',
+                  'Multi-dossiers illimités',
+                  'Portail client collaboratif',
+                  'Assistant IA PCG & BOFIP',
+                  'Créateur d\'agents IA custom',
+                  'Liasses fiscales (2065, 2031, 2035)',
+                  'Comptabilité analytique',
+                  'Module immobilisations & emprunts',
+                  'Facturation électronique e-invoicing 2026',
+                  'Intégrations Cegid & Sage',
+                  'Suivi des temps collaborateurs',
+                  'Onboarding dédié + support prioritaire',
+                ].map(f => (
+                  <li key={f} className="flex items-start gap-2.5 text-slate-700">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+
+              <a href="#contact-cabinet"
+                className="block text-center py-3 px-4 rounded-xl font-semibold text-sm bg-emerald-500 text-white hover:bg-emerald-600 transition-colors shadow-sm">
+                Demander un essai cabinet gratuit
+              </a>
+              <p className="text-center text-xs text-slate-400 mt-2">
+                Plus de 10 utilisateurs ? <a href="#contact-cabinet" className="text-emerald-600 hover:underline">Devis sur mesure adapté</a>.
+              </p>
+            </div>
+          </div>
+
+          {/* Ligne "Toutes les offres incluent" */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            {[
+              { icon: '🔒', text: 'Hébergé en France' },
+              { icon: '🇪🇺', text: 'RGPD natif' },
+              { icon: '🔄', text: 'Migration gratuite' },
+              { icon: '📞', text: 'Support FR' },
+              { icon: '🚫', text: 'Sans engagement' },
+            ].map(b => (
+              <div key={b.text} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-full text-xs text-slate-600 font-medium">
+                <span>{b.icon}</span>
+                {b.text}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -452,28 +662,76 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── TÉMOIGNAGES ── */}
+      {/* ── TÉMOIGNAGES #5 : IAE Dijon ── */}
       <section id="temoignages" className="py-24 px-4 bg-gray-50">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Ils ont adopté FinSoft</h2>
-            <p className="text-slate-500">Plus de 200 cabinets et PME font confiance à notre plateforme</p>
+          <div className="text-center mb-10">
+            {/* Badge officiel IAE Dijon */}
+            <div className="inline-flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl px-6 py-4 mb-8">
+              <span className="text-3xl">🎓</span>
+              <div className="text-left">
+                <p className="font-bold text-slate-900 text-sm">FinSoft — Projet académique IAE Dijon</p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Développé en partenariat avec le département Finance-Comptabilité<br />
+                  de l&apos;IAE de Dijon (Université de Bourgogne)
+                </p>
+              </div>
+            </div>
+            <h2 className="text-3xl font-extrabold text-slate-900 mb-3">Ce qu&apos;ils en disent</h2>
+            <p className="text-slate-500">Retours d&apos;experts et d&apos;étudiants en comptabilité</p>
           </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {TEMOIGNAGES.map(t => (
-              <div key={t.nom} className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
-                <p className="text-slate-700 text-sm leading-relaxed mb-5 italic">&ldquo;{t.texte}&rdquo;</p>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${t.color}`}>
-                    {t.initiales}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">{t.nom}</p>
-                    <p className="text-xs text-slate-500">{t.role}</p>
-                  </div>
+            {/* Témoignage 1 — Professeur IAE */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <p className="text-slate-700 text-sm leading-relaxed mb-5 italic">
+                &ldquo;FinSoft démontre une maîtrise réelle des enjeux de la comptabilité numérique.
+                La conformité PCG et l&apos;intégration BOFIP sont particulièrement bien pensées pour un usage en cabinet.&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  PR
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Pr. [Nom]</p>
+                  <p className="text-xs text-slate-500">Département Finance-Comptabilité, IAE Dijon</p>
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Témoignage 2 — Étudiant M2 CCA */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <p className="text-slate-700 text-sm leading-relaxed mb-5 italic">
+                &ldquo;On a testé FinSoft sur de vrais dossiers en stage. L&apos;OCR et le rapprochement automatique
+                font gagner un temps considérable par rapport aux logiciels classiques.&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  M2
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Étudiant M2 CCA</p>
+                  <p className="text-xs text-slate-500">IAE Dijon — promotion 2026</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Témoignage 3 — Expert-comptable stagiaire */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-6 shadow-sm">
+              <p className="text-slate-700 text-sm leading-relaxed mb-5 italic">
+                &ldquo;La mise en conformité e-invoicing 2026 et l&apos;assistant PCG/BOFIP sont des atouts majeurs.
+                FinSoft répond aux besoins réels des cabinets modernes.&rdquo;
+              </p>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  EC
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">Expert-comptable stagiaire</p>
+                  <p className="text-xs text-slate-500">Partenaire IAE Dijon</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -560,7 +818,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FOOTER ── */}
+      {/* ── FOOTER #4 : liens légaux complets ── */}
       <footer className="bg-slate-900 text-slate-400">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-12">
@@ -576,8 +834,11 @@ export default function HomePage() {
               </p>
               <div className="flex items-center gap-2 mt-4 text-xs text-emerald-400 font-medium">
                 <span>🇫🇷</span>
-                Hébergé en France — RGPD &amp; HDS
+                Hébergé en France — RGPD compliant
               </div>
+              <p className="text-[11px] text-slate-600 mt-3">
+                🎓 Projet académique IAE Dijon · Université de Bourgogne
+              </p>
             </div>
             <div>
               <h4 className="text-sm font-semibold text-white mb-4">Produit</h4>
@@ -594,13 +855,14 @@ export default function HomePage() {
                 <li><Link href="/mentions-legales" className="hover:text-white transition-colors">Mentions légales</Link></li>
                 <li><Link href="/cgv" className="hover:text-white transition-colors">CGV</Link></li>
                 <li><Link href="/cgu" className="hover:text-white transition-colors">CGU</Link></li>
-                <li><Link href="/politique-confidentialite" className="hover:text-white transition-colors">Confidentialité</Link></li>
+                <li><Link href="/politique-confidentialite" className="hover:text-white transition-colors">Confidentialité (RGPD)</Link></li>
+                <li><Link href="/securite" className="hover:text-white transition-colors">Sécurité</Link></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-slate-600">
             <p>© {new Date().getFullYear()} FinSoft. Tous droits réservés.</p>
-            <p>Conçu pour les experts-comptables français 🇫🇷</p>
+            <p>Projet IAE Dijon · Université de Bourgogne 🎓</p>
           </div>
         </div>
       </footer>
