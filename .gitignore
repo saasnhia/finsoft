@@ -16,6 +16,7 @@ supabase/supabase/
 # Source assets
 *.png
 !public/*.png
+!public/**/*.png
 !public/*.ico
 
 # Tesseract OCR models

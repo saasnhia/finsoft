@@ -1,29 +1,29 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-// TODO: Remplacer par vraies captures d'ecran
 const SLIDES = [
   {
     src: '/screenshots/dashboard.png',
     title: 'Tableau de bord complet',
-    description: 'KPIs, balance agee, activite',
+    description: 'KPIs en temps réel, balance âgée clients/fournisseurs, activité récente et recommandations IA',
   },
   {
     src: '/screenshots/relances.png',
     title: 'Relances automatiques',
-    description: 'J+7, J+30, mise en demeure',
+    description: 'Suivi des impayés par niveau J+7, J+30, mise en demeure — sans aucune saisie manuelle',
   },
   {
     src: '/screenshots/assistant.png',
     title: 'Assistant PCG & BOFIP',
-    description: 'Reponses reglementaires instantanees',
+    description: 'Réponses réglementaires instantanées, entraîné sur le droit fiscal français, données anonymisées',
   },
   {
     src: '/screenshots/einvoicing.png',
-    title: 'E-invoicing 2026',
-    description: 'Factur-X, conformite DGFiP certifiee',
+    title: 'E-invoicing 2026 conforme',
+    description: 'Norme Factur-X, profil EN16931, validation automatique des 16 champs obligatoires DGFiP',
   },
 ]
 
@@ -61,11 +61,21 @@ export function ScreenshotCarousel() {
           </div>
         </div>
 
-        {/* Slide content — placeholder */}
-        <div className="relative aspect-[16/9] bg-slate-800 flex flex-col items-center justify-center text-center p-8">
-          <p className="text-2xl font-bold text-white mb-2">{slide.title}</p>
-          <p className="text-slate-400 text-sm">{slide.description}</p>
-          <p className="text-slate-600 text-xs mt-6">Capture d&apos;ecran a venir</p>
+        {/* Slide content — real screenshot */}
+        <div className="relative aspect-[16/9]">
+          <Image
+            src={slide.src}
+            alt={slide.title}
+            fill
+            className="object-cover object-top"
+            priority={current === 0}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
+          />
+          {/* Overlay gradient for title readability */}
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pt-16 pb-4 px-6">
+            <p className="text-lg font-bold text-white mb-1">{slide.title}</p>
+            <p className="text-slate-200 text-sm">{slide.description}</p>
+          </div>
         </div>
       </div>
 
@@ -73,7 +83,7 @@ export function ScreenshotCarousel() {
       <button
         onClick={prev}
         className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white transition-colors"
-        aria-label="Slide precedente"
+        aria-label="Slide précédente"
       >
         <ChevronLeft className="w-5 h-5 text-slate-700" />
       </button>
@@ -94,7 +104,7 @@ export function ScreenshotCarousel() {
             className={`w-2 h-2 rounded-full transition-colors ${
               i === current ? 'bg-emerald-500' : 'bg-gray-300'
             }`}
-            aria-label={`Aller a la slide ${i + 1}`}
+            aria-label={`Aller à la slide ${i + 1}`}
           />
         ))}
       </div>
