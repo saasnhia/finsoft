@@ -85,7 +85,10 @@ export async function POST(req: NextRequest) {
 
         await supabaseAdmin
           .from('user_profiles')
-          .update({ plan: profilePlan })
+          .update({
+            plan: profilePlan,
+            subscription_status: mapToProfileStatus(subscription.status),
+          })
           .eq('id', userId)
 
         break
@@ -111,15 +114,23 @@ export async function POST(req: NextRequest) {
           .update(updates)
           .eq('stripe_subscription_id', sub.id)
 
-        if (profilePlan) {
-          const { data: row } = await supabaseAdmin
-            .from('subscriptions')
-            .select('user_id')
-            .eq('stripe_subscription_id', sub.id)
-            .maybeSingle()
-          if (row?.user_id) {
-            await supabaseAdmin.from('user_profiles').update({ plan: profilePlan }).eq('id', row.user_id)
+        // Always sync subscription_status to user_profiles
+        const { data: subRow2 } = await supabaseAdmin
+          .from('subscriptions')
+          .select('user_id')
+          .eq('stripe_subscription_id', sub.id)
+          .maybeSingle()
+
+        if (subRow2?.user_id) {
+          const profileUpdate: Record<string, string> = {
+            subscription_status: mapToProfileStatus(sub.status),
           }
+          if (profilePlan) profileUpdate.plan = profilePlan
+
+          await supabaseAdmin
+            .from('user_profiles')
+            .update(profileUpdate)
+            .eq('id', subRow2.user_id)
         }
 
         break
@@ -140,7 +151,10 @@ export async function POST(req: NextRequest) {
           .eq('stripe_subscription_id', sub.id)
           .maybeSingle()
         if (row?.user_id) {
-          await supabaseAdmin.from('user_profiles').update({ plan: 'starter' }).eq('id', row.user_id)
+          await supabaseAdmin
+            .from('user_profiles')
+            .update({ plan: 'starter', subscription_status: 'cancelled' })
+            .eq('id', row.user_id)
         }
 
         break
@@ -155,6 +169,19 @@ export async function POST(req: NextRequest) {
           .from('subscriptions')
           .update({ status: 'past_due' })
           .eq('stripe_customer_id', customerId)
+
+        // Sync to user_profiles
+        const { data: failedSubRow } = await supabaseAdmin
+          .from('subscriptions')
+          .select('user_id')
+          .eq('stripe_customer_id', customerId)
+          .maybeSingle()
+        if (failedSubRow?.user_id) {
+          await supabaseAdmin
+            .from('user_profiles')
+            .update({ subscription_status: 'inactive' })
+            .eq('id', failedSubRow.user_id)
+        }
 
         break
       }
@@ -197,13 +224,14 @@ export async function POST(req: NextRequest) {
           day: 'numeric', month: 'long', year: 'numeric',
         })
 
+        const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? 'https://finpilote.vercel.app'
         const { subject, html } = generateTrialEndingEmail({
           prenom,
           trialEndDate: trialEndStr,
           planName,
           priceMonthly,
-          dashboardUrl: 'https://finpilote.vercel.app/dashboard',
-          settingsUrl: 'https://finpilote.vercel.app/dashboard/settings?tab=abonnement',
+          dashboardUrl: `${appUrl}/dashboard`,
+          settingsUrl: `${appUrl}/dashboard/settings?tab=abonnement`,
         })
 
         await sendEmail({
@@ -235,5 +263,18 @@ function mapStripeStatus(status: Stripe.Subscription.Status): string {
     case 'canceled':  return 'canceled'
     case 'incomplete':return 'incomplete'
     default:          return 'past_due'
+  }
+}
+
+/**
+ * Maps Stripe subscription status → user_profiles.subscription_status
+ * DB CHECK constraint: 'active' | 'inactive' | 'trial' | 'cancelled'
+ */
+function mapToProfileStatus(stripeStatus: Stripe.Subscription.Status): string {
+  switch (stripeStatus) {
+    case 'active':     return 'active'
+    case 'trialing':   return 'trial'
+    case 'canceled':   return 'cancelled'
+    default:           return 'inactive'
   }
 }

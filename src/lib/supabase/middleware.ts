@@ -15,6 +15,7 @@ const PUBLIC_PATHS = [
   '/mentions-legales',
   '/securite',
   '/cabinet',
+  '/about',
 ]
 
 /**
@@ -25,6 +26,7 @@ const PUBLIC_PATHS = [
 const PUBLIC_PREFIXES = [
   '/auth/',             // /auth/callback, /auth/login, /auth/register, /auth/forgot-password
   '/portail/',          // /portail/[token] — portail client accessible sans compte
+  '/legal/',            // /legal/cgv, /legal/cgu, /legal/politique-confidentialite
   '/api/auth/',
   '/api/health',
   '/api/contact',
