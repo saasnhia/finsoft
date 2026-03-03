@@ -43,7 +43,8 @@ export async function POST(req: NextRequest) {
     const priceId = billing === 'annual' ? plan.annual : plan.monthly
 
     if (!priceId) {
-      return NextResponse.json({ error: 'Price ID introuvable pour ce plan' }, { status: 400 })
+      console.error(`[checkout] Price ID missing for plan=${planKey} billing=${billing}. Check env var STRIPE_${planKey}_${billing.toUpperCase()}`)
+      return NextResponse.json({ error: `Price ID introuvable pour le plan ${planKey} (${billing}). Vérifiez les variables d'environnement Stripe.` }, { status: 400 })
     }
 
     // Check if user already has a Stripe customer ID
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?welcome=true`,
-      cancel_url:  `${origin}/#pricing`,
+      cancel_url:  `${origin}/pricing`,
       metadata: { user_id: user.id, plan_id: planKey, billing },
       subscription_data: {
         trial_period_days: plan.trial_days ?? 30,

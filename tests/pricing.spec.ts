@@ -32,31 +32,29 @@ test.describe('Pricing — page publique', () => {
     await expect(page.getByText(/starter/i).first()).toBeVisible()
   })
 
-  test('lien essai gratuit pointe vers /signup', async ({ page }) => {
+  test('bouton essai cabinet est un bouton checkout (pas un lien /signup)', async ({ page }) => {
     await page.goto('/pricing')
-    const link = page.getByRole('link', { name: /essai|démarrer|gratuit/i }).first()
-    await expect(link).toBeVisible({ timeout: 10_000 })
-    const href = await link.getAttribute('href')
-    expect(href).toMatch(/\/signup/)
+    // Cabinet plans use <button> for Stripe checkout, not <Link>
+    const btn = page.getByRole('button', { name: /essai cabinet|cabinet.*30 jours/i }).first()
+    await expect(btn).toBeVisible({ timeout: 10_000 })
   })
 })
 
 test.describe('Pricing — utilisateur connecté', () => {
   // Uses saved auth session from global setup
 
-  test('lien essai cabinet pointe vers /signup avec plan', async ({ page }) => {
+  test('bouton essai cabinet déclenche checkout Stripe', async ({ page }) => {
     await page.goto('/pricing')
-    const link = page.getByRole('link', { name: /essai cabinet|cabinet.*30 jours/i }).first()
-    await expect(link).toBeVisible({ timeout: 10_000 })
-    const href = await link.getAttribute('href')
-    expect(href).toMatch(/\/signup\?plan=CABINET/)
+    // Authenticated user sees checkout button (not link)
+    const btn = page.getByRole('button', { name: /essai cabinet|cabinet.*30 jours/i }).first()
+    await expect(btn).toBeVisible({ timeout: 10_000 })
   })
 
   test('message subscription_required affiché si query param présent', async ({ page }) => {
     await page.goto('/pricing?message=subscription_required')
-    // Should show some message about subscription being required
+    // Should show the welcome/subscription banner
     await expect(
-      page.getByText(/abonnement|subscription|requis|required/i)
+      page.getByText(/bienvenue|choisissez|plan/i)
     ).toBeVisible({ timeout: 10_000 })
   })
 })

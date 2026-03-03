@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { CheckCircle2, X, ArrowRight } from 'lucide-react'
+import { CheckCircle2, X, Loader2 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────
 // HELPERS
@@ -352,12 +352,33 @@ const PROFILES_PLANS: PlanCardData[][] = [
 // PLAN CARD COMPONENT
 // ─────────────────────────────────────────────────────────────
 
-function PlanCard({ plan, annual }: { plan: PlanCardData; annual: boolean }) {
+interface PlanCardProps {
+  plan: PlanCardData
+  annual: boolean
+  onSubscribe?: (planKey: string, billing: 'monthly' | 'annual') => void
+  subscribing?: string | null
+}
+
+function PlanCard({ plan, annual, onSubscribe, subscribing }: PlanCardProps) {
+  const billing: 'monthly' | 'annual' = annual ? 'annual' : 'monthly'
+  const isLoading = subscribing === plan.planKey
+
+  // When onSubscribe is provided AND plan has a planKey, use button for checkout
+  const useButton = !!onSubscribe && !!plan.planKey && !plan.isContact
+
   const href = plan.isContact
     ? 'mailto:contact@finsoft.app'
     : plan.planKey
-      ? `/signup?plan=${plan.planKey}&billing=${annual ? 'annual' : 'monthly'}`
+      ? `/signup?plan=${plan.planKey}&billing=${billing}`
       : '/signup'
+
+  const ctaClasses = `block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-colors ${
+    plan.featured
+      ? 'bg-emerald-500 text-white hover:bg-emerald-600'
+      : plan.isContact
+        ? 'bg-slate-900 text-white hover:bg-slate-800'
+        : 'border border-gray-200 text-slate-700 hover:bg-gray-50'
+  } ${isLoading ? 'opacity-70 cursor-wait' : ''}`
 
   return (
     <div className={`rounded-2xl border p-6 flex flex-col relative overflow-hidden ${
@@ -441,16 +462,23 @@ function PlanCard({ plan, annual }: { plan: PlanCardData; annual: boolean }) {
         ))}
       </ul>
 
-      <Link href={href}
-        className={`block text-center py-3 px-4 rounded-xl font-semibold text-sm transition-colors ${
-          plan.featured
-            ? 'bg-emerald-500 text-white hover:bg-emerald-600'
-            : plan.isContact
-              ? 'bg-slate-900 text-white hover:bg-slate-800'
-              : 'border border-gray-200 text-slate-700 hover:bg-gray-50'
-        }`}>
-        {plan.cta}
-      </Link>
+      {useButton ? (
+        <button
+          onClick={() => onSubscribe(plan.planKey!, billing)}
+          disabled={!!subscribing}
+          className={`w-full ${ctaClasses}`}>
+          {isLoading ? (
+            <span className="inline-flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Redirection…
+            </span>
+          ) : plan.cta}
+        </button>
+      ) : (
+        <Link href={href} className={ctaClasses}>
+          {plan.cta}
+        </Link>
+      )}
       {plan.ctaNote && (
         <p className={`text-center text-xs mt-2 ${plan.featured ? 'text-slate-500' : 'text-slate-400'}`}>
           {plan.ctaNote}
@@ -469,9 +497,13 @@ interface PricingPlansProps {
   defaultProfile?: number
   /** Section id for anchor links */
   sectionId?: string
+  /** Called when user clicks a plan CTA — triggers Stripe checkout instead of Link navigation */
+  onSubscribe?: (planKey: string, billing: 'monthly' | 'annual') => void
+  /** Plan id currently being processed (shows loading spinner) */
+  subscribing?: string | null
 }
 
-export function PricingPlans({ defaultProfile = 3, sectionId }: PricingPlansProps) {
+export function PricingPlans({ defaultProfile = 3, sectionId, onSubscribe, subscribing }: PricingPlansProps) {
   const [annual, setAnnual] = useState(false)
   const [profilIdx, setProfilIdx] = useState(defaultProfile)
 
@@ -533,7 +565,7 @@ export function PricingPlans({ defaultProfile = 3, sectionId }: PricingPlansProp
               : 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto'
         }`}>
           {PROFILES_PLANS[profilIdx].map(plan => (
-            <PlanCard key={plan.id} plan={plan} annual={annual} />
+            <PlanCard key={plan.id} plan={plan} annual={annual} onSubscribe={onSubscribe} subscribing={subscribing} />
           ))}
         </div>
 
