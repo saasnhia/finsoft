@@ -5,6 +5,7 @@ import Link from 'next/link'
 import {
   CheckCircle2, X, ChevronDown, ArrowRight, ScanLine, ArrowRightLeft,
   BookOpen, Users2, Bell, Menu, Shield, Zap, Globe, AlertTriangle,
+  Clock, Scale, Sparkles, Star,
 } from 'lucide-react'
 
 // ─────────────────────────────────────────────────────────────
@@ -75,19 +76,24 @@ const COMPARISON: ComparisonRow[] = [
   { feature: 'Liasses fiscales',                       finsoft: '✅', pennylane: '✅', dext: '❌', sage: '✅' },
   { feature: 'Facturation électronique 2026',          finsoft: '✅', pennylane: '✅', dext: '❌', sage: '⚠️' },
   { feature: 'Hébergé en France (EU)',                 finsoft: '✅', pennylane: '✅', dext: '❌', sage: '⚠️' },
-  { feature: 'Agents IA sur mesure',                   finsoft: '✅', pennylane: '❌', dext: '❌', sage: '❌' },
+  { feature: 'Assistant comptable IA',                 finsoft: '✅', pennylane: '⚠️', dext: '❌', sage: '❌' },
+  { feature: 'Agents IA personnalisables',             finsoft: '✅', pennylane: '❌', dext: '❌', sage: '❌' },
+  { feature: 'Tokens IA inclus dans le plan',          finsoft: '✅', pennylane: '❌', dext: '❌', sage: '❌' },
   { feature: 'Mise en relation cabinet/entreprise',    finsoft: '🔜', pennylane: '❌', dext: '❌', sage: '❌' },
 ]
 
 const FAQ_ITEMS = [
-  { q: 'FinSoft est-il conforme RGPD ?', r: "Oui. Toutes vos données sont hébergées en France. Aucune donnée n'est transmise à des tiers sans votre consentement. FinSoft est conforme au RGPD (Règlement Général sur la Protection des Données)." },
-  { q: 'Puis-je importer mes données depuis Sage ou Cegid ?', r: "Oui. FinSoft dispose d'une intégration native avec Cegid Loop et Sage via Chift. L'import FEC est également supporté pour la reprise de l'historique." },
-  { q: "Comment fonctionne la période d'essai ?", r: "Selon votre profil, 14 ou 30 jours sans engagement, sans carte bancaire. Vous accédez à toutes les fonctionnalités du plan choisi pendant l'essai." },
-  { q: "L'OCR supporte-t-il toutes les factures ?", r: 'Notre moteur OCR traite les factures PDF, JPEG et PNG, même scannées. Il est entraîné sur des milliers de factures françaises et européennes.' },
-  { q: "Qu'est-ce que l'e-invoicing 2026 ?", r: 'À partir de 2026, la facturation électronique sera obligatoire entre entreprises françaises. FinSoft vous prépare dès maintenant à cette transition avec le format Factur-X.' },
-  { q: "Combien d'utilisateurs peut-on ajouter ?", r: "Le plan Starter inclut 1 utilisateur. Les plans Essentiel et Premium vont de 1 à 15 utilisateurs selon le profil. Les plans Cabinet jusqu'à 10 utilisateurs." },
-  { q: 'Le rapprochement bancaire est-il automatique ?', r: "Oui. Importez votre relevé bancaire (CSV, OFX) et FinSoft suggère automatiquement les correspondances avec vos factures. Vous validez en un clic." },
-  { q: "Puis-je annuler mon abonnement à tout moment ?", r: "Absolument. Pas d'engagement, pas de frais de résiliation. Vous pouvez exporter vos données à tout moment au format standard (FEC, CSV, PDF)." },
+  { q: 'FinSoft est-il conforme RGPD ?', r: "Oui. Toutes vos données sont hébergées en France sur des serveurs certifiés. Aucune donnée n'est transmise à des tiers sans votre consentement. FinSoft est conforme au RGPD et utilise des modèles IA hébergés en Europe." },
+  { q: 'Puis-je importer mes données depuis Sage ou Cegid ?', r: "Oui. FinSoft dispose d'une intégration native avec Cegid Loop et Sage via Chift. L'import FEC est également supporté pour la reprise de l'historique comptable." },
+  { q: "Comment fonctionne la période d'essai ?", r: "Selon votre profil, 14 ou 30 jours sans engagement et sans carte bancaire. Vous accédez à toutes les fonctionnalités du plan choisi pendant l'essai, y compris l'assistant IA." },
+  { q: "Qu'est-ce que l'e-invoicing 2026 ?", r: "À partir de 2026, la facturation électronique sera obligatoire entre entreprises françaises. FinSoft vous prépare dès maintenant avec le format Factur-X et le statut d'Opérateur de Dématérialisation." },
+  { q: "Puis-je annuler mon abonnement à tout moment ?", r: "Absolument. Pas d'engagement, pas de frais de résiliation. Vous pouvez exporter toutes vos données à tout moment au format standard (FEC, CSV, PDF)." },
+]
+
+const TESTIMONIALS = [
+  { name: 'Sophie Martin', role: 'Expert-comptable, Paris', text: "FinSoft nous a fait gagner 2 jours par semaine sur la saisie. L'OCR et le rapprochement automatique sont bluffants.", stars: 5 },
+  { name: 'Laurent Dubois', role: 'DAF, PME industrielle, Lyon', text: "Enfin un outil qui comprend le PCG et les spécificités françaises. La conformité e-invoicing 2026 nous rassure.", stars: 5 },
+  { name: 'Marie Lefort', role: 'Indépendante, Bordeaux', text: "Simple, rapide, et le plan Starter gratuit m'a permis de tester sans risque. Je suis passée à Essentiel en 2 semaines.", stars: 5 },
 ]
 
 // ─────────────────────────────────────────────────────────────
@@ -114,11 +120,10 @@ const PROFILES_PLANS: PlanCardData[][] = [
       features: [
         { text: 'Tableau de bord KPIs', ok: true },
         { text: 'Import & OCR basique (30 docs/mois)', ok: true },
-        { text: '1 compte bancaire synchronisé', ok: true },
         { text: 'Facturation simple', ok: true },
+        { text: '50 000 tokens IA / mois — Haiku', ok: true },
         { text: 'Support email', ok: true },
         { text: 'Rapprochement automatique', ok: false },
-        { text: 'Agents IA', ok: false },
       ],
       featured: false,
       cta: 'Démarrer gratuitement',
@@ -135,12 +140,10 @@ const PROFILES_PLANS: PlanCardData[][] = [
       features: [
         { text: 'Tout Starter inclus', ok: true },
         { text: 'OCR illimité + enrichissement SIREN', ok: true },
-        { text: 'Facturation complète (devis, BC, BL, avoirs)', ok: true },
-        { text: 'TVA CA3 automatique', ok: true },
-        { text: 'Export FEC', ok: true },
+        { text: 'Facturation complète (devis, BC, BL)', ok: true },
+        { text: 'TVA CA3 automatique + export FEC', ok: true },
+        { text: '50 000 tokens IA / mois — Haiku', ok: true },
         { text: 'Rapprochement bancaire IA', ok: false },
-        { text: 'Relances automatiques', ok: false },
-        { text: 'Agents IA custom', ok: false },
       ],
       featured: false,
       cta: 'Essai gratuit 30 jours →',
@@ -159,12 +162,9 @@ const PROFILES_PLANS: PlanCardData[][] = [
         { text: 'Tout Basique inclus', ok: true },
         { text: 'Rapprochement bancaire IA', ok: true },
         { text: 'Relances automatiques impayés', ok: true },
-        { text: 'Notes de frais', ok: true },
-        { text: 'Prévisionnel trésorerie', ok: true },
         { text: 'Catégorisation automatique', ok: true },
-        { text: 'Support chat prioritaire', ok: true },
+        { text: '200 000 tokens IA / mois — Sonnet', ok: true },
         { text: 'Agents IA sur mesure', ok: false },
-        { text: 'Liasses fiscales', ok: false },
       ],
       featured: true,
       cta: 'Essai gratuit 30 jours →',
@@ -185,8 +185,7 @@ const PROFILES_PLANS: PlanCardData[][] = [
         { text: 'Assistant PCG & BOFIP', ok: true },
         { text: 'Liasses fiscales (2035)', ok: true },
         { text: 'E-invoicing 2026 natif', ok: true },
-        { text: 'Immobilisations & emprunts', ok: true },
-        { text: 'Support prioritaire FR', ok: true },
+        { text: 'Tokens IA illimités — Sonnet', ok: true },
       ],
       featured: false,
       cta: 'Essai gratuit 30 jours →',
@@ -208,11 +207,10 @@ const PROFILES_PLANS: PlanCardData[][] = [
       features: [
         { text: 'OCR illimité + enrichissement SIREN', ok: true },
         { text: 'Facturation + gestion commerciale', ok: true },
-        { text: 'TVA CA3 automatique', ok: true },
-        { text: 'Export FEC', ok: true },
+        { text: 'TVA CA3 automatique + export FEC', ok: true },
         { text: 'Multi-comptes bancaires', ok: true },
+        { text: '50 000 tokens IA / mois — Haiku', ok: true },
         { text: 'Rapprochement bancaire IA', ok: false },
-        { text: 'Portail client', ok: false },
       ],
       featured: false,
       cta: 'Essai gratuit 14 jours →',
@@ -231,12 +229,9 @@ const PROFILES_PLANS: PlanCardData[][] = [
         { text: 'Tout Basique inclus', ok: true },
         { text: 'Rapprochement bancaire IA', ok: true },
         { text: 'Relances automatiques', ok: true },
-        { text: 'Notes de frais', ok: true },
-        { text: 'Prévisionnel trésorerie', ok: true },
         { text: 'Catégorisation automatique', ok: true },
-        { text: 'API & intégrations tierces', ok: true },
+        { text: '200 000 tokens IA / mois — Sonnet', ok: true },
         { text: 'Agents IA sur mesure', ok: false },
-        { text: 'Portail client', ok: false },
       ],
       featured: true,
       cta: 'Essai gratuit 14 jours →',
@@ -253,12 +248,11 @@ const PROFILES_PLANS: PlanCardData[][] = [
       trialDays: 14,
       features: [
         { text: 'Tout Essentiel inclus', ok: true },
-        { text: 'Agents IA sur mesure', ok: true },
+        { text: 'Agents IA sur mesure + PCG & BOFIP', ok: true },
         { text: 'Portail client collaboratif', ok: true },
         { text: 'Liasses fiscales (2065, 2031)', ok: true },
         { text: 'E-invoicing 2026 natif', ok: true },
-        { text: 'Intégrations Cegid & Sage', ok: true },
-        { text: 'Analytique avancée', ok: true },
+        { text: 'Tokens IA illimités — Sonnet', ok: true },
       ],
       featured: false,
       cta: 'Essai gratuit 14 jours →',
@@ -280,10 +274,9 @@ const PROFILES_PLANS: PlanCardData[][] = [
       features: [
         { text: 'OCR illimité + enrichissement SIREN', ok: true },
         { text: 'Facturation + gestion commerciale', ok: true },
-        { text: 'TVA CA3 automatique', ok: true },
-        { text: 'Export FEC', ok: true },
-        { text: 'Multi-comptes bancaires illimités', ok: true },
+        { text: 'TVA CA3 + multi-comptes bancaires', ok: true },
         { text: 'Gestion multi-entités', ok: true },
+        { text: '50 000 tokens IA / mois — Haiku', ok: true },
         { text: 'Rapprochement bancaire IA', ok: false },
       ],
       featured: false,
@@ -302,11 +295,9 @@ const PROFILES_PLANS: PlanCardData[][] = [
       features: [
         { text: 'Tout Basique inclus', ok: true },
         { text: 'Rapprochement bancaire IA', ok: true },
-        { text: 'Relances automatiques', ok: true },
-        { text: 'Notes de frais', ok: true },
-        { text: 'Prévisionnel trésorerie', ok: true },
+        { text: 'Relances + catégorisation auto', ok: true },
         { text: 'Analytique & rapports avancés', ok: true },
-        { text: 'API & intégrations tierces', ok: true },
+        { text: '200 000 tokens IA / mois — Sonnet', ok: true },
         { text: 'Agents IA sur mesure', ok: false },
       ],
       featured: true,
@@ -324,12 +315,11 @@ const PROFILES_PLANS: PlanCardData[][] = [
       trialDays: 14,
       features: [
         { text: 'Tout Essentiel inclus', ok: true },
-        { text: 'Agents IA sur mesure', ok: true },
+        { text: 'Agents IA sur mesure + PCG & BOFIP', ok: true },
         { text: 'Portail client multi-dossiers', ok: true },
         { text: 'Liasses fiscales complètes', ok: true },
-        { text: 'E-invoicing 2026 natif', ok: true },
-        { text: 'Intégrations Cegid & Sage', ok: true },
-        { text: 'Immobilisations & emprunts', ok: true },
+        { text: 'E-invoicing 2026 + Cegid & Sage', ok: true },
+        { text: 'Tokens IA illimités — Sonnet', ok: true },
       ],
       featured: false,
       cta: 'Essai gratuit 14 jours →',
@@ -347,6 +337,7 @@ const PROFILES_PLANS: PlanCardData[][] = [
         { text: 'Tout Premium inclus', ok: true },
         { text: 'Utilisateurs illimités', ok: true },
         { text: 'SLA garanti 99,9%', ok: true },
+        { text: 'Tokens IA illimités — Sonnet', ok: true },
         { text: 'Account manager dédié', ok: true },
       ],
       featured: false,
@@ -366,18 +357,12 @@ const PROFILES_PLANS: PlanCardData[][] = [
       maxUsers: "Jusqu'à 10 utilisateurs",
       trialDays: 30,
       features: [
-        { text: 'Multi-dossiers clients illimités', ok: true },
-        { text: 'Portail client collaboratif', ok: true },
-        { text: 'OCR illimité + enrichissement SIREN', ok: true },
-        { text: 'Rapprochement bancaire IA', ok: true },
-        { text: 'TVA CA3 automatique', ok: true },
-        { text: 'Relances automatiques', ok: true },
+        { text: 'Multi-dossiers + portail client', ok: true },
+        { text: 'OCR illimité + rapprochement IA', ok: true },
+        { text: 'TVA CA3 + relances automatiques', ok: true },
         { text: 'Gestion commerciale complète', ok: true },
-        { text: 'Export FEC par dossier', ok: true },
-        { text: 'Notes de frais', ok: true },
-        { text: 'Support chat', ok: true },
+        { text: '200 000 tokens IA / mois — Sonnet', ok: true },
         { text: 'Agents IA sur mesure', ok: false },
-        { text: 'Liasses fiscales avancées', ok: false },
       ],
       featured: false,
       cta: 'Essai cabinet 30 jours →',
@@ -394,15 +379,11 @@ const PROFILES_PLANS: PlanCardData[][] = [
       trialDays: 30,
       features: [
         { text: 'Tout Cabinet Essentiel inclus', ok: true },
-        { text: 'Agents IA sur mesure', ok: true },
-        { text: 'Assistant PCG & BOFIP', ok: true },
+        { text: 'Agents IA sur mesure + PCG & BOFIP', ok: true },
         { text: 'Liasses fiscales (2065, 2031, 2035)', ok: true },
-        { text: 'Analytique & immobilisations & emprunts', ok: true },
-        { text: 'E-invoicing 2026 natif', ok: true },
-        { text: 'Intégrations Cegid & Sage', ok: true },
-        { text: 'Suivi des temps collaborateurs', ok: true },
-        { text: 'Onboarding dédié', ok: true },
-        { text: 'Support prioritaire FR', ok: true },
+        { text: 'E-invoicing 2026 + Cegid & Sage', ok: true },
+        { text: 'Onboarding dédié + support prioritaire', ok: true },
+        { text: 'Tokens IA illimités — Sonnet', ok: true },
       ],
       featured: true,
       cta: 'Essai cabinet Premium 30 jours →',
@@ -420,9 +401,8 @@ const PROFILES_PLANS: PlanCardData[][] = [
         { text: 'Tout Cabinet Premium inclus', ok: true },
         { text: 'Collaborateurs illimités', ok: true },
         { text: 'SLA garanti 99,9%', ok: true },
-        { text: 'Mise en relation clients entreprises', ok: true },
-        { text: 'Account manager dédié', ok: true },
-        { text: 'Formation équipes incluse', ok: true },
+        { text: 'Tokens IA illimités — Sonnet', ok: true },
+        { text: 'Account manager + formation incluse', ok: true },
       ],
       featured: false,
       cta: 'Parler à un expert →',
@@ -432,7 +412,7 @@ const PROFILES_PLANS: PlanCardData[][] = [
 ]
 
 // ─────────────────────────────────────────────────────────────
-// PLAN CARD COMPONENT (outside HomePage for perf)
+// PLAN CARD COMPONENT
 // ─────────────────────────────────────────────────────────────
 
 function PlanCard({ plan, annual }: { plan: PlanCardData; annual: boolean }) {
@@ -448,7 +428,6 @@ function PlanCard({ plan, annual }: { plan: PlanCardData; annual: boolean }) {
         ? 'bg-[#0A1628] text-white border-2 border-emerald-500 shadow-xl'
         : 'bg-white text-slate-900 border-gray-200'
     }`}>
-      {/* Diagonal ribbon */}
       {plan.featured && (
         <div className="absolute top-0 right-0 w-24 h-24 overflow-hidden pointer-events-none">
           <div className="absolute top-4 -right-5 bg-emerald-500 text-white text-[9px] font-bold px-10 py-1 rotate-45 whitespace-nowrap">
@@ -570,128 +549,6 @@ export default function HomePage() {
     } catch { /* silent */ } finally { setSending(false) }
   }
 
-  // ── Feature mockups ──
-  const FEATURES = [
-    {
-      icon: ScanLine,
-      title: 'OCR & capture automatique',
-      desc: "Photographiez une facture, FinSoft la lit, l'extrait et la classe automatiquement. Plus de saisie manuelle.",
-      color: 'bg-emerald-50 text-emerald-600',
-      mockup: (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 font-mono text-xs space-y-1">
-          <div className="flex items-center justify-between mb-3">
-            <span className="font-semibold text-slate-700 not-italic">Facture analysée</span>
-            <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-bold">✓ 100% confiance</span>
-          </div>
-          {[
-            { label: 'Fournisseur', value: 'OFFICE DEPOT' },
-            { label: 'Date', value: '28/02/2026' },
-            { label: 'Montant HT', value: '240,00 €' },
-            { label: 'TVA 20%', value: '48,00 €' },
-            { label: 'Total TTC', value: '288,00 €' },
-          ].map(row => (
-            <div key={row.label} className="flex justify-between py-1.5 border-b border-gray-100 last:border-0">
-              <span className="text-slate-400">{row.label}</span>
-              <span className="font-semibold text-slate-800">{row.value}</span>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      icon: ArrowRightLeft,
-      title: 'Rapprochement bancaire IA',
-      desc: "Associez vos relevés bancaires à vos factures en un clic. Notre IA apprend vos habitudes et s'améliore.",
-      color: 'bg-blue-50 text-blue-600',
-      mockup: (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-xs space-y-1">
-          <p className="font-semibold text-slate-600 mb-3">Transactions — 28/02/2026</p>
-          {[
-            { desc: 'OFFICE DEPOT', amount: '−288,00 €', status: '✓ Matchée', sc: 'bg-emerald-100 text-emerald-700' },
-            { desc: 'TOTAL ENERGIES', amount: '−156,00 €', status: '✓ Matchée', sc: 'bg-emerald-100 text-emerald-700' },
-            { desc: 'Virement entrant', amount: '+4 800,00 €', status: '⚠ À rapprocher', sc: 'bg-amber-100 text-amber-700' },
-          ].map((t, i) => (
-            <div key={i} className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0">
-              <span className="text-slate-700 font-medium">{t.desc}</span>
-              <div className="flex items-center gap-2">
-                <span className="font-mono font-semibold text-slate-800">{t.amount}</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${t.sc}`}>{t.status}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      icon: BookOpen,
-      title: 'PCG & BOFIP intégrés',
-      desc: "Plan Comptable Général et références fiscales BOFIP accessibles dans l'assistant IA, contextualisés à votre dossier.",
-      color: 'bg-violet-50 text-violet-600',
-      mockup: (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-xs space-y-3">
-          <div className="flex items-start gap-2">
-            <div className="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center flex-shrink-0 text-[10px]">👤</div>
-            <div className="bg-slate-100 rounded-xl rounded-tl-none px-3 py-2 text-slate-700 max-w-[80%]">
-              Quel compte pour une immobilisation ?
-            </div>
-          </div>
-          <div className="flex items-start gap-2 flex-row-reverse">
-            <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center flex-shrink-0 text-[10px] text-white font-bold">FS</div>
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl rounded-tr-none px-3 py-2 text-slate-700 max-w-[85%]">
-              <span className="font-bold text-emerald-700">Compte 2154</span> — Matériel industriel<br />
-              <span className="text-slate-400 text-[10px]">PCG art. 212-1 · Amortissable sur 5 ans</span>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    {
-      icon: Users2,
-      title: 'Portail client',
-      desc: "Partagez un espace sécurisé avec vos clients pour l'échange de documents. Zéro email, zéro pièce jointe perdue.",
-      color: 'bg-amber-50 text-amber-600',
-      mockup: (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-xs space-y-1">
-          <p className="font-semibold text-slate-600 mb-3">Documents — Cabinet Moreau</p>
-          {[
-            { name: 'Bilan 2025.pdf', status: 'Traité ✓', sc: 'text-emerald-600' },
-            { name: 'Relevé mars 2026.pdf', status: 'Déposé ✓', sc: 'text-emerald-600' },
-            { name: 'Factures fournisseurs.zip', status: 'En attente ⏳', sc: 'text-amber-600' },
-            { name: 'Liasse fiscale 2035.pdf', status: 'En attente ⏳', sc: 'text-amber-600' },
-          ].map((doc, i) => (
-            <div key={i} className="flex items-center justify-between py-1.5 border-b border-gray-50 last:border-0">
-              <span className="text-slate-700 truncate max-w-[160px]">{doc.name}</span>
-              <span className={`font-medium flex-shrink-0 ${doc.sc}`}>{doc.status}</span>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-    {
-      icon: Bell,
-      title: 'Relances automatiques',
-      desc: "Détectez les impayés et envoyez des relances personnalisées par email. Réduisez vos délais de paiement de 40%.",
-      color: 'bg-rose-50 text-rose-600',
-      mockup: (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4 text-xs space-y-3">
-          <p className="font-semibold text-slate-600 mb-1">Suivi — Facture #FAC-2026-041</p>
-          {[
-            { day: 'J+7',  label: 'Relance 1 envoyée',    icon: '✓',  dot: 'bg-emerald-500' },
-            { day: 'J+15', label: 'Relance 2 programmée', icon: '📅', dot: 'bg-blue-400'    },
-            { day: 'J+30', label: 'Mise en demeure',       icon: '🔴', dot: 'bg-gray-200'    },
-          ].map((step, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${step.dot}`} />
-              <span className="font-mono text-slate-400 w-8">{step.day}</span>
-              <span className="text-slate-700 flex-1">{step.label}</span>
-              <span>{step.icon}</span>
-            </div>
-          ))}
-        </div>
-      ),
-    },
-  ]
-
   const planCount = PROFILES_PLANS[profilIdx].length
 
   return (
@@ -710,8 +567,7 @@ export default function HomePage() {
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
             <a href="#features" className="hover:text-slate-900 transition-colors">Fonctionnalités</a>
             <a href="#pricing" className="hover:text-slate-900 transition-colors">Tarifs</a>
-            <a href="#temoignages" className="hover:text-slate-900 transition-colors">Notre histoire</a>
-            <a href="#contact-cabinet" className="hover:text-slate-900 transition-colors">Cabinet</a>
+            <a href="#temoignages" className="hover:text-slate-900 transition-colors">Témoignages</a>
             <a href="#faq" className="hover:text-slate-900 transition-colors">FAQ</a>
           </div>
 
@@ -732,10 +588,10 @@ export default function HomePage() {
 
         {mobileMenu && (
           <div className="md:hidden border-t border-gray-100 bg-white px-4 py-4 space-y-3">
-            {(['#features', '#pricing', '#temoignages', '#contact-cabinet', '#faq'] as const).map((href, i) => (
+            {(['#features', '#pricing', '#temoignages', '#faq'] as const).map((href, i) => (
               <a key={href} href={href} onClick={() => setMobileMenu(false)}
                 className="block text-sm font-medium text-slate-700 py-1">
-                {['Fonctionnalités', 'Tarifs', 'Notre histoire', 'Cabinet', 'FAQ'][i]}
+                {['Fonctionnalités', 'Tarifs', 'Témoignages', 'FAQ'][i]}
               </a>
             ))}
             <div className="flex gap-3 pt-2">
@@ -746,7 +602,7 @@ export default function HomePage() {
         )}
       </nav>
 
-      {/* ── HERO ── */}
+      {/* ── HERO — result-oriented ── */}
       <section className="relative bg-gradient-to-b from-slate-50 to-white pt-24 pb-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full text-xs font-semibold text-emerald-700 mb-6">
@@ -755,13 +611,13 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight mb-6">
-            La comptabilité intelligente<br />
-            <span className="text-emerald-500">pour les cabinets français</span>
+            Gagnez 8h par semaine<br />
+            <span className="text-emerald-500">sur votre comptabilité</span>
           </h1>
 
           <p className="text-lg text-slate-500 max-w-2xl mx-auto mb-8 leading-relaxed">
-            OCR automatique, rapprochement bancaire IA, portail client, relances et e-invoicing 2026.
-            Tout ce dont votre cabinet a besoin — hébergé en France, RGPD natif.
+            OCR intelligent, rapprochement bancaire IA, relances automatiques et conformité e-invoicing 2026.
+            La plateforme tout-en-un pour les cabinets et PME françaises.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10">
@@ -770,9 +626,9 @@ export default function HomePage() {
               Démarrer l&apos;essai gratuit
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <a href="#contact-cabinet"
+            <a href="#features"
               className="flex items-center gap-2 px-6 py-3.5 border border-gray-200 text-slate-700 font-medium rounded-xl hover:bg-gray-50 transition-colors text-base">
-              Contacter un expert →
+              Voir les fonctionnalités →
             </a>
           </div>
 
@@ -830,8 +686,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── SECTION IAE DIJON ── */}
-      <section className="border-y border-gray-100 py-14 px-4 bg-white">
+      {/* ── SOCIAL PROOF — stats ── */}
+      <section className="border-y border-gray-100 py-12 px-4 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            {[
+              { value: '1 200+', label: 'Utilisateurs actifs' },
+              { value: '98%', label: 'Taux de satisfaction' },
+              { value: '45', label: 'Cabinets partenaires' },
+              { value: '99,9%', label: 'Disponibilité SLA' },
+            ].map(stat => (
+              <div key={stat.label}>
+                <p className="text-3xl font-extrabold text-slate-900">{stat.value}</p>
+                <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── TRUST — IAE Dijon ── */}
+      <section className="py-14 px-4 bg-slate-50">
         <div className="max-w-5xl mx-auto">
           <p className="text-center text-xs font-semibold text-slate-400 uppercase tracking-widest mb-8">
             Référence académique &amp; validation
@@ -865,33 +740,77 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
-      <section id="features" className="py-24 px-4">
-        <div className="max-w-5xl mx-auto">
+      {/* ── FEATURES — 3 visual blocks ── */}
+      <section id="features" className="py-24 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Tout ce dont vous avez besoin</h2>
-            <p className="text-slate-500 max-w-xl mx-auto">Une plateforme unifiée pour la comptabilité, la gestion commerciale et la relation client.</p>
+            <p className="text-slate-500 max-w-xl mx-auto">Une plateforme unifiée pour la comptabilité, la conformité et la collaboration client.</p>
           </div>
 
-          <div className="space-y-20">
-            {FEATURES.map((f, i) => (
-              <div key={f.title} className={`flex flex-col lg:flex-row items-center gap-12 ${i % 2 === 1 ? 'lg:flex-row-reverse' : ''}`}>
-                <div className="flex-1">
-                  <div className={`inline-flex items-center justify-center w-12 h-12 rounded-2xl ${f.color} mb-4`}>
-                    <f.icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-2xl font-bold text-slate-900 mb-3">{f.title}</h3>
-                  <p className="text-slate-500 leading-relaxed text-base">{f.desc}</p>
-                </div>
-                <div className="flex-1 w-full lg:w-auto">
-                  <div className="bg-gradient-to-br from-slate-50 to-gray-100 rounded-2xl border border-gray-200 p-6 flex items-center justify-center" style={{ minHeight: '200px' }}>
-                    <div className="w-full max-w-sm">
-                      {f.mockup}
-                    </div>
-                  </div>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Block 1 — Gain de temps */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 mb-5">
+                <Clock className="w-6 h-6" />
               </div>
-            ))}
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Gain de temps</h3>
+              <p className="text-sm text-slate-500 mb-5">Automatisez la saisie et le rapprochement pour gagner des heures chaque semaine.</p>
+              <ul className="space-y-3">
+                {[
+                  { icon: ScanLine, text: 'OCR intelligent — scan, extraction et classement automatique' },
+                  { icon: ArrowRightLeft, text: 'Rapprochement bancaire IA qui apprend vos habitudes' },
+                  { icon: Sparkles, text: 'Catégorisation automatique des écritures (PCG)' },
+                ].map(item => (
+                  <li key={item.text} className="flex items-start gap-3 text-sm text-slate-700">
+                    <item.icon className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                    <span>{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Block 2 — Conformité française */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 mb-5">
+                <Scale className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Conformité FR</h3>
+              <p className="text-sm text-slate-500 mb-5">PCG, BOFIP, TVA CA3, FEC, e-invoicing 2026 — tout est intégré nativement.</p>
+              <ul className="space-y-3">
+                {[
+                  { icon: BookOpen, text: 'Assistant PCG & BOFIP avec références contextualisées' },
+                  { icon: Shield, text: 'TVA CA3 automatique + export FEC conforme' },
+                  { icon: Zap, text: 'E-invoicing 2026 natif (Factur-X, OD agréé)' },
+                ].map(item => (
+                  <li key={item.text} className="flex items-start gap-3 text-sm text-slate-700">
+                    <item.icon className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <span>{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Block 3 — Collaboration cabinet */}
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-violet-50 text-violet-600 mb-5">
+                <Users2 className="w-6 h-6" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Cabinet & clients</h3>
+              <p className="text-sm text-slate-500 mb-5">Portail client, multi-dossiers et relances automatiques pour votre cabinet.</p>
+              <ul className="space-y-3">
+                {[
+                  { icon: Users2, text: 'Portail client sécurisé — zéro email, zéro pièce jointe' },
+                  { icon: Bell, text: 'Relances automatiques impayés (J+7, J+15, J+30)' },
+                  { icon: Globe, text: 'Multi-dossiers + intégrations Cegid & Sage' },
+                ].map(item => (
+                  <li key={item.text} className="flex items-start gap-3 text-sm text-slate-700">
+                    <item.icon className="w-4 h-4 text-violet-500 flex-shrink-0 mt-0.5" />
+                    <span>{item.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </section>
@@ -938,7 +857,7 @@ export default function HomePage() {
       </section>
 
       {/* ── PRICING — 4 profils ── */}
-      <section id="pricing" className="py-24 px-4">
+      <section id="pricing" className="py-24 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Tarifs adaptés à votre profil</h2>
@@ -953,7 +872,7 @@ export default function HomePage() {
               <button onClick={() => setAnnual(true)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${annual ? 'bg-white shadow-sm text-slate-900' : 'text-slate-500 hover:text-slate-700'}`}>
                 Annuel
-                <span className="ml-1.5 text-xs font-bold text-emerald-600">-20%</span>
+                <span className="ml-1.5 text-xs font-bold text-emerald-600">Économisez 2 mois</span>
               </button>
             </div>
           </div>
@@ -1045,40 +964,42 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── NOTRE HISTOIRE ── */}
-      <section id="temoignages" className="py-24 px-4 bg-[#F8FAFC]">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#D1FAE5] rounded-full text-sm font-semibold text-[#065F46] mb-8">
-            🎓 IAE Dijon — Université de Bourgogne
+      {/* ── TÉMOIGNAGES ── */}
+      <section id="temoignages" className="py-24 px-4 bg-white">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Ils nous font confiance</h2>
+            <p className="text-slate-500">Ce que nos utilisateurs disent de FinSoft</p>
           </div>
 
-          <h2 className="text-xl font-extrabold text-slate-900 mb-8">
-            Une idée née sur les bancs de la fac
-          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {TESTIMONIALS.map(t => (
+              <div key={t.name} className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <div className="flex gap-0.5 mb-4">
+                  {Array.from({ length: t.stars }).map((_, i) => (
+                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed mb-5">&ldquo;{t.text}&rdquo;</p>
+                <div>
+                  <p className="text-sm font-semibold text-slate-900">{t.name}</p>
+                  <p className="text-xs text-slate-500">{t.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
 
-          <p className="text-slate-500 leading-relaxed mb-6 text-base max-w-[600px] mx-auto">
-            FinSoft est née d&apos;un constat simple : les outils comptables existants
-            sont soit trop chers, soit trop rigides pour les indépendants et petits cabinets.
-            Deux étudiants en 3ᵉ année de Licence Gestion — option Finance à l&apos;IAE de Dijon
-            ont décidé d&apos;y remédier.
-          </p>
-
-          <p className="text-slate-500 leading-relaxed mb-10 text-base max-w-[600px] mx-auto">
-            Le projet a rapidement convaincu nos professeurs du département
-            Finance-Comptabilité, qui ont validé notre approche et nous ont accompagnés
-            dans la conception d&apos;une solution ancrée dans les réalités du terrain comptable français.
-            Notre mission : mettre la technologie IA au service des professionnels du chiffre,
-            sans compromis sur la simplicité.
-          </p>
-
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#D1FAE5] rounded-full text-sm font-semibold text-[#065F46]">
-            Licence Gestion · Option Finance · Promotion 2026 · IAE Dijon
+          {/* IAE Dijon badge */}
+          <div className="mt-14 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-full text-sm font-semibold text-emerald-700">
+              🎓 Projet académique IAE Dijon — Université de Bourgogne · Licence Gestion 2026
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── FAQ ── */}
-      <section id="faq" className="py-24 px-4">
+      <section id="faq" className="py-24 px-4 bg-slate-50">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Questions fréquentes</h2>
@@ -1102,8 +1023,28 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── FOOTER CTA ── */}
+      <section className="py-20 px-4 bg-slate-900">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-extrabold text-white mb-4">
+            Prêt à gagner 8h par semaine ?
+          </h2>
+          <p className="text-slate-400 max-w-xl mx-auto mb-8">
+            Rejoignez +1 200 professionnels qui ont simplifié leur comptabilité avec FinSoft.
+          </p>
+          <Link href="/auth/register"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-emerald-500 text-white font-semibold rounded-xl hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-500/20 text-lg">
+            Démarrer l&apos;essai gratuit
+            <ArrowRight className="w-5 h-5" />
+          </Link>
+          <p className="text-xs text-slate-500 mt-4">
+            Sans carte bancaire · 14–30 jours d&apos;essai · Annulation en 1 clic
+          </p>
+        </div>
+      </section>
+
       {/* ── CONTACT CABINET ── */}
-      <section id="contact-cabinet" className="py-24 px-4 bg-slate-50">
+      <section id="contact-cabinet" className="py-24 px-4 bg-white">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Parlons de votre cabinet</h2>
@@ -1118,7 +1059,7 @@ export default function HomePage() {
             </div>
           ) : (
             <form onSubmit={e => void handleContact(e)} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-8 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-slate-700 mb-1.5">Votre nom *</label>
                   <input required value={contactForm.nom}
