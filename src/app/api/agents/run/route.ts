@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
+import { checkAndConsumeTokens, getModelForPlan } from '@/lib/ai-quota'
 
 function getAnthropicClient() {
   return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
@@ -27,6 +28,24 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+    // Get user plan
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('plan')
+      .eq('id', user.id)
+      .single()
+    const plan = (profile?.plan as string) ?? 'starter'
+    const model = getModelForPlan(plan)
+
+    // Pre-check quota (estimate ~300 tokens for agent call)
+    const quotaOk = await checkAndConsumeTokens(supabase, user.id, 300, plan, model, 'agent')
+    if (!quotaOk) {
+      return NextResponse.json(
+        { success: false, error: 'Quota mensuel de tokens IA atteint. Passez à un plan supérieur pour continuer.', upgrade: true },
+        { status: 429 }
+      )
+    }
 
     const body = await request.json() as { agent_id: string; context_data?: Record<string, string> }
     const { agent_id, context_data = {} } = body
@@ -63,7 +82,7 @@ export async function POST(request: NextRequest) {
     // Call Claude
     const anthropic = getAnthropicClient()
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
+      model,
       max_tokens: 1024,
       system: 'Tu es un assistant comptable expert. Tu réponds de manière concise et professionnelle en français.',
       messages: [{ role: 'user', content: finalPrompt }],
@@ -71,11 +90,22 @@ export async function POST(request: NextRequest) {
 
     const responseText = response.content[0]?.type === 'text' ? response.content[0].text : ''
 
+    // Log actual token usage (adjust the pre-estimated 300)
+    const actualTokens = (response.usage?.input_tokens ?? 0) + (response.usage?.output_tokens ?? 0)
+    if (actualTokens > 300) {
+      void supabase.from('ai_usage').insert({
+        user_id: user.id,
+        tokens_used: actualTokens - 300,
+        model,
+        endpoint: 'agent',
+      }).then(() => {})
+    }
+
     // Update log (success)
     if (logId) {
       void supabase.from('agent_logs').update({
         statut: 'success',
-        output_data: { result: responseText },
+        output_data: { result: responseText, tokens: actualTokens },
       }).eq('id', logId).then(() => {})
     }
 

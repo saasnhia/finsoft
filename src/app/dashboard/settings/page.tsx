@@ -108,6 +108,9 @@ export default function SettingsPage() {
   const [portalLoading, setPortalLoading] = useState(false)
   const [resetSent, setResetSent] = useState(false)
 
+  // AI usage
+  const [aiUsage, setAiUsage] = useState<{ used: number; quota: number } | null>(null)
+
   // Danger zone
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState('')
@@ -148,6 +151,15 @@ export default function SettingsPage() {
       if (subData) {
         setSubscription(subData as SubscriptionData)
       }
+
+      // Fetch AI usage
+      try {
+        const res = await fetch('/api/usage/ai')
+        if (res.ok) {
+          const usage = await res.json() as { used: number; quota: number }
+          setAiUsage(usage)
+        }
+      } catch { /* silent */ }
     } catch { /* silent */ }
     finally { setLoading(false) }
   }, [user?.id])
@@ -503,6 +515,45 @@ export default function SettingsPage() {
                             </div>
                           )}
                         </>
+                      )}
+                    </div>
+
+                    {/* Usage IA */}
+                    <div className="bg-white border border-navy-100 rounded-2xl p-6">
+                      <h2 className="text-base font-semibold text-navy-900 mb-4">Usage IA ce mois</h2>
+                      {aiUsage ? (
+                        <div>
+                          <div className="flex items-end justify-between mb-2">
+                            <p className="text-sm text-navy-700 font-medium">
+                              {aiUsage.used.toLocaleString('fr-FR')} / {aiUsage.quota >= 999_999_999 ? 'Illimité' : aiUsage.quota.toLocaleString('fr-FR')} tokens
+                            </p>
+                            <p className="text-xs text-navy-500">
+                              {aiUsage.quota >= 999_999_999 ? '∞' : `${Math.min(100, Math.round((aiUsage.used / aiUsage.quota) * 100))}%`}
+                            </p>
+                          </div>
+                          <div className="w-full h-2.5 bg-navy-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${
+                                aiUsage.quota < 999_999_999 && aiUsage.used / aiUsage.quota > 0.9
+                                  ? 'bg-red-500'
+                                  : aiUsage.quota < 999_999_999 && aiUsage.used / aiUsage.quota > 0.7
+                                    ? 'bg-amber-500'
+                                    : 'bg-emerald-500'
+                              }`}
+                              style={{ width: aiUsage.quota >= 999_999_999 ? '5%' : `${Math.min(100, (aiUsage.used / aiUsage.quota) * 100)}%` }}
+                            />
+                          </div>
+                          <p className="text-xs text-navy-400 mt-2">
+                            {plan === 'starter'
+                              ? 'Plan Starter : 50 000 tokens/mois (modèle Haiku). Passez au plan Cabinet pour 200 000 tokens et le modèle Sonnet.'
+                              : plan === 'cabinet'
+                                ? 'Plan Cabinet : 200 000 tokens/mois (modèle Sonnet). Passez au plan Pro pour un usage illimité.'
+                                : 'Plan Pro : usage illimité (modèle Sonnet).'
+                            }
+                          </p>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-navy-400">Chargement...</p>
                       )}
                     </div>
                   </div>

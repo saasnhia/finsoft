@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@/lib/supabase/server'
+import { checkAndConsumeTokens, getModelForPlan } from '@/lib/ai-quota'
 
 function getAnthropicClient() {
   return new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
@@ -35,6 +36,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'conversation_id et message requis' }, { status: 400 })
     }
 
+    // Get user plan
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('plan')
+      .eq('id', user.id)
+      .single()
+    const plan = (profile?.plan as string) ?? 'starter'
+    const model = getModelForPlan(plan)
+
+    // Pre-check quota (estimate ~500 tokens for request)
+    const quotaOk = await checkAndConsumeTokens(supabase, user.id, 500, plan, model, 'assistant')
+    if (!quotaOk) {
+      return NextResponse.json(
+        { error: 'Quota mensuel de tokens IA atteint. Passez à un plan supérieur pour continuer.', upgrade: true },
+        { status: 429 }
+      )
+    }
+
     // Verify conversation belongs to user
     const { data: conv } = await supabase
       .from('conversations_assistant')
@@ -67,12 +86,16 @@ export async function POST(request: NextRequest) {
     let fullResponse = ''
     const encoder = new TextEncoder()
 
+    // Capture for closure
+    const capturedSupabase = supabase
+    const capturedUserId = user.id
+
     const readable = new ReadableStream({
       async start(controller) {
         try {
           const anthropic = getAnthropicClient()
           const stream = anthropic.messages.stream({
-            model: 'claude-sonnet-4-6',
+            model,
             max_tokens: 2048,
             system: SYSTEM_PROMPT,
             messages,
@@ -89,16 +112,32 @@ export async function POST(request: NextRequest) {
             }
           }
 
+          // Get final message for actual token counts
+          const finalMessage = await stream.finalMessage()
+          const inputTokens = finalMessage.usage?.input_tokens ?? 0
+          const outputTokens = finalMessage.usage?.output_tokens ?? 0
+          const actualTokens = inputTokens + outputTokens
+
+          // Log actual token delta (we pre-logged 500 estimate)
+          if (actualTokens > 500) {
+            void capturedSupabase.from('ai_usage').insert({
+              user_id: capturedUserId,
+              tokens_used: actualTokens - 500,
+              model,
+              endpoint: 'assistant',
+            }).then(() => {})
+          }
+
           // Save assistant message after stream
-          await supabase.from('messages_assistant').insert({
+          await capturedSupabase.from('messages_assistant').insert({
             conversation_id,
             role: 'assistant',
             content: fullResponse,
           })
 
-          // Update conversation timestamp + auto-title on first exchange
+          // Update conversation timestamp
           const updatePayload: Record<string, string> = { updated_at: new Date().toISOString() }
-          await supabase
+          await capturedSupabase
             .from('conversations_assistant')
             .update(updatePayload)
             .eq('id', conversation_id)
