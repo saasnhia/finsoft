@@ -60,6 +60,8 @@ const sections: SidebarSection[] = [
       { name: 'Import Relevé', href: '/import-releve', icon: Upload },
       { name: 'TVA', href: '/tva', icon: Euro },
       { name: 'Rapprochement', href: '/rapprochement', icon: ArrowRightLeft },
+      { name: 'Immobilisations', href: '/dashboard/immobilisations', icon: Building2 },
+      { name: 'Analytique', href: '/dashboard/analytique', icon: PieChart },
     ],
   },
   {
@@ -79,6 +81,20 @@ const sections: SidebarSection[] = [
       { name: 'Catalogue', href: '/commercial/catalogue', icon: Package },
       { name: 'Abonnements', href: '/commercial/abonnements', icon: RefreshCw },
       { name: 'Imports', href: '/commercial/imports', icon: Upload },
+    ],
+  },
+  {
+    label: 'Finances',
+    icon: Euro,
+    items: [
+      { name: 'Notes de frais', href: '/dashboard/notes-de-frais', icon: Receipt },
+    ],
+  },
+  {
+    label: 'Achats',
+    icon: ShoppingCart,
+    items: [
+      { name: 'Demandes d\'achat', href: '/dashboard/achats', icon: ShoppingCart },
     ],
   },
   {

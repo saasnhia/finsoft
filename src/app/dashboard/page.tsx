@@ -24,8 +24,13 @@ import {
   Landmark,
   ShoppingCart,
   Loader2,
+  TrendingUp,
+  TrendingDown,
+  Wallet,
+  Target,
 } from 'lucide-react'
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/client'
 import { toast } from 'react-hot-toast'
 import type { BalanceAgeeItem } from '../api/dashboard/summary/route'
 
@@ -258,6 +263,8 @@ export default function DashboardPage() {
   const [data, setData] = useState<DashboardData | null>(null)
   const [loading, setLoading] = useState(true)
   const [showFECModal, setShowFECModal] = useState(false)
+  const [extraKpis, setExtraKpis] = useState<{ caHT: number | null; chargesHT: number | null }>({ caHT: null, chargesHT: null })
+  const [extraLoading, setExtraLoading] = useState(false)
 
   // Redirect to pricing only once both auth and subscription are fully loaded
   useEffect(() => {
@@ -283,6 +290,29 @@ if (!authLoading && initialized && user && !isActive) {
     if (user && isActive) fetchData()
     else if (!user) setLoading(false)
   }, [user, isActive, fetchData])
+
+  useEffect(() => {
+    if (!user?.id || !isActive) return
+    void (async () => {
+      setExtraLoading(true)
+      try {
+        const supabase = createClient()
+        const year = new Date().getFullYear()
+        const startOfYear = `${year}-01-01`
+        const [caRes, chargesRes] = await Promise.all([
+          supabase.from('factures_clients').select('total_ht').eq('user_id', user.id).gte('date_emission', startOfYear),
+          supabase.from('factures').select('montant_ht').eq('user_id', user.id).gte('date_facture', startOfYear),
+        ])
+        const caHT = caRes.data ? caRes.data.reduce((s: number, r: { total_ht: number | null }) => s + (r.total_ht ?? 0), 0) : null
+        const chargesHT = chargesRes.data ? chargesRes.data.reduce((s: number, r: { montant_ht: number | null }) => s + (r.montant_ht ?? 0), 0) : null
+        setExtraKpis({ caHT, chargesHT })
+      } catch {
+        // silently fail
+      } finally {
+        setExtraLoading(false)
+      }
+    })()
+  }, [user?.id, isActive])
 
   const handleValidateRapprochement = async (id: string) => {
     try {
@@ -461,6 +491,161 @@ if (!authLoading && initialized && user && !isActive) {
           {kpiCards.map((card, i) => (
             <SimpleKPICard key={i} {...card} />
           ))}
+        </div>
+
+        {/* ── KPIs Financiers étendus ─────────────────────────────────── */}
+        <div className="space-y-5 mb-8">
+
+          {/* Trésorerie */}
+          <div>
+            <h3 className="text-[11px] font-semibold text-navy-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+              <Wallet className="w-3.5 h-3.5" />
+              Trésorerie
+            </h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <SimpleKPICard
+                title="Solde bancaire"
+                value={kpis != null ? formatCurrency(kpis.tresorerie) : '—'}
+                subtitle="Dernier relevé importé"
+                icon={<Landmark className="w-5 h-5 text-emerald-600" />}
+                accent="bg-emerald-500"
+                variant={kpis && kpis.tresorerie < 0 ? 'danger' : 'success'}
+                loading={loading}
+              />
+              <SimpleKPICard
+                title="BFR estimé"
+                value={kpis != null ? formatCurrency(kpis.encours_clients - kpis.fournisseurs_a_payer) : '—'}
+                subtitle="Encours clients − fournisseurs"
+                icon={kpis != null && (kpis.encours_clients - kpis.fournisseurs_a_payer) >= 0
+                  ? <TrendingUp className="w-5 h-5 text-blue-600" />
+                  : <TrendingDown className="w-5 h-5 text-red-600" />}
+                accent="bg-blue-500"
+                variant={kpis != null && (kpis.encours_clients - kpis.fournisseurs_a_payer) < 0 ? 'danger' : 'default'}
+                loading={loading}
+              />
+              <SimpleKPICard
+                title="Prévisionnel J+30"
+                value="—"
+                subtitle="Indisponible — connecter banque"
+                icon={<Target className="w-5 h-5 text-navy-400" />}
+                accent="bg-navy-300"
+                variant="default"
+                loading={false}
+              />
+              <SimpleKPICard
+                title="Var. mois précédent"
+                value="—"
+                subtitle="Nécessite historique 2 mois"
+                icon={<TrendingUp className="w-5 h-5 text-navy-400" />}
+                accent="bg-navy-300"
+                variant="default"
+                loading={false}
+              />
+            </div>
+          </div>
+
+          {/* P&L */}
+          <div>
+            <h3 className="text-[11px] font-semibold text-navy-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+              <TrendingUp className="w-3.5 h-3.5" />
+              Compte de résultat (YTD)
+            </h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <SimpleKPICard
+                title="CA HT (clients)"
+                value={extraKpis.caHT != null ? formatCurrency(extraKpis.caHT) : '—'}
+                subtitle={`Factures clients ${new Date().getFullYear()}`}
+                icon={<ArrowUpRight className="w-5 h-5 text-emerald-600" />}
+                accent="bg-emerald-500"
+                variant="success"
+                loading={extraLoading}
+              />
+              <SimpleKPICard
+                title="Charges HT"
+                value={extraKpis.chargesHT != null ? formatCurrency(extraKpis.chargesHT) : '—'}
+                subtitle={`Factures fournisseurs ${new Date().getFullYear()}`}
+                icon={<ArrowDownRight className="w-5 h-5 text-red-600" />}
+                accent="bg-red-500"
+                variant={extraKpis.chargesHT != null && extraKpis.chargesHT > 0 ? 'warning' : 'default'}
+                loading={extraLoading}
+              />
+              <SimpleKPICard
+                title="Marge brute"
+                value={extraKpis.caHT != null && extraKpis.chargesHT != null
+                  ? formatCurrency(extraKpis.caHT - extraKpis.chargesHT)
+                  : '—'}
+                subtitle={extraKpis.caHT != null && extraKpis.caHT > 0 && extraKpis.chargesHT != null
+                  ? `Taux : ${Math.round(((extraKpis.caHT - extraKpis.chargesHT) / extraKpis.caHT) * 100)} %`
+                  : 'CA clients – charges'}
+                icon={<Euro className="w-5 h-5 text-amber-600" />}
+                accent="bg-amber-500"
+                variant={extraKpis.caHT != null && extraKpis.chargesHT != null && (extraKpis.caHT - extraKpis.chargesHT) < 0 ? 'danger' : 'default'}
+                loading={extraLoading}
+              />
+              <SimpleKPICard
+                title="CA N-1"
+                value="—"
+                subtitle="Données année précédente"
+                icon={<TrendingDown className="w-5 h-5 text-navy-400" />}
+                accent="bg-navy-300"
+                variant="default"
+                loading={false}
+              />
+            </div>
+          </div>
+
+          {/* Recouvrement */}
+          <div>
+            <h3 className="text-[11px] font-semibold text-navy-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
+              <Users className="w-3.5 h-3.5" />
+              Recouvrement clients
+            </h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <SimpleKPICard
+                title="Encours clients"
+                value={kpis ? formatCurrency(kpis.encours_clients) : '—'}
+                subtitle={kpis ? `${kpis.count_en_attente} facture${kpis.count_en_attente !== 1 ? 's' : ''} en attente` : 'Chargement…'}
+                icon={<ReceiptText className="w-5 h-5 text-blue-600" />}
+                accent="bg-blue-500"
+                variant="default"
+                loading={loading}
+              />
+              <SimpleKPICard
+                title="Retard clients"
+                value={kpis ? formatCurrency(kpis.total_en_retard) : '—'}
+                subtitle={kpis ? `${kpis.count_en_retard} facture${kpis.count_en_retard !== 1 ? 's' : ''} en retard` : 'Chargement…'}
+                icon={<Clock className="w-5 h-5 text-red-600" />}
+                accent="bg-red-500"
+                variant={kpis && kpis.count_en_retard > 0 ? 'danger' : 'default'}
+                loading={loading}
+              />
+              <SimpleKPICard
+                title="DSO (jours)"
+                value={kpis != null && extraKpis.caHT != null && extraKpis.caHT > 0
+                  ? `${Math.round((kpis.encours_clients / (extraKpis.caHT / 365)))} j`
+                  : '—'}
+                subtitle="Délai moyen recouvrement"
+                icon={<Target className="w-5 h-5 text-amber-600" />}
+                accent="bg-amber-500"
+                variant="default"
+                loading={loading || extraLoading}
+              />
+              <SimpleKPICard
+                title="Taux retard"
+                value={kpis != null && kpis.encours_clients > 0
+                  ? `${Math.round((kpis.total_en_retard / kpis.encours_clients) * 100)} %`
+                  : '—'}
+                subtitle="Retard / encours total"
+                icon={kpis != null && kpis.encours_clients > 0 && (kpis.total_en_retard / kpis.encours_clients) > 0.2
+                  ? <TrendingDown className="w-5 h-5 text-red-600" />
+                  : <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+                accent={kpis != null && kpis.encours_clients > 0 && (kpis.total_en_retard / kpis.encours_clients) > 0.2 ? 'bg-red-500' : 'bg-emerald-500'}
+                variant={kpis != null && kpis.encours_clients > 0 && (kpis.total_en_retard / kpis.encours_clients) > 0.2 ? 'danger' : 'success'}
+                loading={loading}
+              />
+            </div>
+          </div>
+
         </div>
 
         {/* Panel KPIs entreprise enrichis + graphique 6 mois */}
