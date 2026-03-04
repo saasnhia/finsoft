@@ -76,13 +76,16 @@ const REGIMES_TVA = [
 ]
 
 const PLAN_LABELS: Record<string, string> = {
-  starter: 'Starter', cabinet: 'Cabinet', pro: 'Pro',
+  basique: 'Basique', essentiel: 'Essentiel', premium: 'Premium',
+  cabinet_essentiel: 'Cabinet Essentiel', cabinet_premium: 'Cabinet Premium',
 }
 
 const PLAN_COLORS: Record<string, string> = {
-  starter: 'bg-slate-100 text-slate-700',
-  cabinet: 'bg-blue-100 text-blue-700',
-  pro: 'bg-emerald-100 text-emerald-700',
+  basique: 'bg-slate-100 text-slate-700',
+  essentiel: 'bg-blue-100 text-blue-700',
+  premium: 'bg-emerald-100 text-emerald-700',
+  cabinet_essentiel: 'bg-blue-100 text-blue-700',
+  cabinet_premium: 'bg-emerald-100 text-emerald-700',
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -544,11 +547,11 @@ export default function SettingsPage() {
                             />
                           </div>
                           <p className="text-xs text-navy-400 mt-2">
-                            {plan === 'starter'
-                              ? 'Plan Starter : 50 000 tokens/mois (modèle Haiku). Passez au plan Cabinet pour 200 000 tokens et le modèle Sonnet.'
-                              : plan === 'cabinet'
-                                ? 'Plan Cabinet : 200 000 tokens/mois (modèle Sonnet). Passez au plan Pro pour un usage illimité.'
-                                : 'Plan Pro : usage illimité (modèle Sonnet).'
+                            {plan === 'basique'
+                              ? 'Plan Basique : 50 000 tokens/mois (modèle Haiku). Passez au plan Essentiel pour 200 000 tokens et le modèle Sonnet.'
+                              : plan === 'premium' || plan === 'cabinet_premium'
+                                ? 'Plan Premium : usage illimité (modèle Sonnet).'
+                                : 'Plan Essentiel : 200 000 tokens/mois (modèle Sonnet). Passez au plan Premium pour un usage illimité.'
                             }
                           </p>
                         </div>

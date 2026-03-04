@@ -153,7 +153,7 @@ export async function POST(req: NextRequest) {
         if (row?.user_id) {
           await supabaseAdmin
             .from('user_profiles')
-            .update({ plan: 'starter', subscription_status: 'cancelled' })
+            .update({ plan: 'basique', subscription_status: 'cancelled' })
             .eq('id', row.user_id)
         }
 

@@ -9,7 +9,7 @@ export interface Subscription {
   user_id: string
   stripe_customer_id: string
   stripe_subscription_id: string | null
-  plan: 'starter' | 'cabinet' | 'pro'
+  plan: 'basique' | 'essentiel' | 'premium' | 'cabinet_essentiel' | 'cabinet_premium'
   status: 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete'
   current_period_end: string | null
 }

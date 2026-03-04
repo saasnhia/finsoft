@@ -182,7 +182,7 @@ export function Sidebar() {
   }, [user?.id])
 
   const [profileName, setProfileName] = useState<string>('')
-  const [profilePlan, setProfilePlan] = useState<string>('starter')
+  const [profilePlan, setProfilePlan] = useState<string>('basique')
 
   // Fetch profile_type, name and plan
   useEffect(() => {

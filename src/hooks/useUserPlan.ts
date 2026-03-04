@@ -17,7 +17,7 @@ interface UserPlan {
 export function useUserPlan() {
   const { user } = useAuth()
   const [userPlan, setUserPlan] = useState<UserPlan>({
-    plan: 'starter',
+    plan: 'basique',
     facturesCount: 0,
     facturesLimit: 300,
     maxUsers: 1,

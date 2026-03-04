@@ -164,7 +164,7 @@ function PremiumBanner() {
 export default function LiassesPage() {
   const { user } = useAuth()
   const { plan, loading: planLoading } = useUserPlan()
-  const isPremium = plan === 'pro'
+  const isPremium = plan === 'premium' || plan === 'cabinet_premium'
 
   const [typeLiasse, setTypeLiasse] = useState<TypeLiasse>('2065')
   const [exercice, setExercice] = useState(new Date().getFullYear() - 1)

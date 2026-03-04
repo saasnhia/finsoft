@@ -34,7 +34,7 @@ export function useSessionSlot() {
     active: 0,
     limit: null,
     limitLabel: '∞',
-    plan: 'starter',
+    plan: 'basique',
     checked: false,
   })
   const pingRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -58,7 +58,7 @@ export function useSessionSlot() {
         active: data.active ?? 0,
         limit: data.limit === Infinity ? null : (data.limit ?? null),
         limitLabel: data.limitLabel ?? '∞',
-        plan: data.plan ?? 'starter',
+        plan: data.plan ?? 'basique',
         checked: true,
       })
 

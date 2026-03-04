@@ -139,7 +139,7 @@ function PremiumBanner() {
 export default function AgentsPage() {
   const { user } = useAuth()
   const { plan, loading: planLoading } = useUserPlan()
-  const isPremium = plan === 'pro'
+  const isPremium = plan === 'premium' || plan === 'cabinet_premium'
 
   const [agents, setAgents] = useState<Agent[]>([])
   const [loading, setLoading] = useState(true)

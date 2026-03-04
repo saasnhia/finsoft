@@ -190,7 +190,7 @@ export default function AchatsPage() {
 
   const filtered = filterStatut === 'tous' ? demandes : demandes.filter(d => d.statut === filterStatut)
 
-  const isEssentielPlus = plan === 'cabinet' || plan === 'pro'
+  const isEssentielPlus = plan !== 'basique'
 
   if (planLoading) return null
 

@@ -5,21 +5,23 @@ import { SupabaseClient } from '@supabase/supabase-js'
  */
 export function getMonthlyQuota(plan: string): number {
   switch (plan) {
-    case 'starter':  return 50_000
-    case 'cabinet':  return 200_000
-    case 'pro':      return 999_999_999
-    default:         return 50_000
+    case 'basique':           return 50_000
+    case 'essentiel':         return 200_000
+    case 'cabinet_essentiel': return 200_000
+    case 'premium':           return 999_999_999
+    case 'cabinet_premium':   return 999_999_999
+    default:                  return 50_000
   }
 }
 
 /**
  * Modèle Anthropic selon le plan utilisateur.
- * Plan starter → Haiku (rapide, économique)
+ * Plan basique → Haiku (rapide, économique)
  * Autres → Sonnet (performant)
  */
 export function getModelForPlan(plan: string): string {
   switch (plan) {
-    case 'starter':  return 'claude-haiku-4-5-20251001'
+    case 'basique':  return 'claude-haiku-4-5-20251001'
     default:         return 'claude-sonnet-4-5-20241022'
   }
 }

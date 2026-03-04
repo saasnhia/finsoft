@@ -49,7 +49,7 @@ function CabinetBanner() {
 export default function PortailCabinetPage() {
   const { user } = useAuth()
   const { plan, loading: planLoading } = useUserPlan()
-  const isCabinet = plan === 'cabinet' || plan === 'pro'
+  const isCabinet = plan === 'cabinet_essentiel' || plan === 'cabinet_premium'
 
   const [portails, setPortails] = useState<PortailClient[]>([])
   const [loading, setLoading] = useState(true)

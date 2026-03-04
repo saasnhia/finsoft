@@ -18,7 +18,7 @@ export async function GET() {
     .eq('id', user.id)
     .single()
 
-  const plan = (profile?.plan as string) ?? 'starter'
+  const plan = (profile?.plan as string) ?? 'basique'
   const used = await getMonthlyUsage(supabase, user.id)
   const quota = getMonthlyQuota(plan)
 

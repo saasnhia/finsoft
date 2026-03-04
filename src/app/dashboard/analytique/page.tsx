@@ -176,7 +176,7 @@ export default function AnalytiquePage() {
     URL.revokeObjectURL(url)
   }
 
-  const isPremium = plan === 'pro' || plan === 'cabinet'
+  const isPremium = plan !== 'basique'
   const isTrial = !isPremium // Show trial banner if not on a paid plan that includes this feature
 
   if (planLoading) return null

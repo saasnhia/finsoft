@@ -1,3 +1,5 @@
+import type { Plan } from '@/lib/auth/check-plan'
+
 export interface PlanConfig {
   monthly: string | undefined
   annual: string | undefined
@@ -122,11 +124,24 @@ export const PLANS: Record<string, PlanConfig> = {
 
 /**
  * Maps a Stripe plan key to the user_profiles.plan value.
- * Handles legacy keys (pro/cabinet/starter) and new keys.
+ * Handles legacy keys and new keys.
  */
-export function mapPlanKeyToProfilePlan(planKey: string): 'starter' | 'cabinet' | 'pro' {
-  const k = planKey.toLowerCase()
-  if (k === 'starter' || k === 'basique_indep' || k === 'basique_tpe' || k === 'basique_pme') return 'starter'
-  if (k === 'cabinet' || k.startsWith('cabinet_')) return 'cabinet'
-  return 'pro'
+export function mapPlanKeyToProfilePlan(planKey: string): Plan {
+  const k = planKey.toUpperCase()
+  // Free / basique tier
+  if (k === 'STARTER' || k === 'BASIQUE_INDEP' || k === 'BASIQUE_TPE' || k === 'BASIQUE_PME') return 'basique'
+  // Essentiel tier
+  if (k === 'ESSENTIEL_INDEP' || k === 'ESSENTIEL_TPE' || k === 'ESSENTIEL_PME') return 'essentiel'
+  // Premium tier
+  if (k === 'PREMIUM_INDEP' || k === 'PREMIUM_TPE' || k === 'PREMIUM_PME') return 'premium'
+  // Cabinet tiers
+  if (k === 'CABINET_ESSENTIEL') return 'cabinet_essentiel'
+  if (k === 'CABINET_PREMIUM') return 'cabinet_premium'
+  // Legacy aliases
+  if (k === 'BASIQUE') return 'basique'
+  if (k === 'ESSENTIEL') return 'essentiel'
+  if (k === 'PREMIUM' || k === 'PRO') return 'premium'
+  if (k === 'CABINET') return 'cabinet_essentiel'
+  // Default
+  return 'basique'
 }

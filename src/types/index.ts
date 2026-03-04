@@ -12,7 +12,7 @@ export interface User {
 
 export interface UserProfile {
   id: string
-  plan: 'starter' | 'cabinet' | 'pro'
+  plan: 'basique' | 'essentiel' | 'premium' | 'cabinet_essentiel' | 'cabinet_premium'
   factures_count: number
   factures_limit: number
   max_users: number

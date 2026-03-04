@@ -97,7 +97,7 @@ function MessageBubble({ msg, onCopy }: { msg: { role: string; content: string }
 export default function AssistantPage() {
   const { user } = useAuth()
   const { plan, loading: planLoading } = useUserPlan()
-  const isEssentielPlus = plan === 'cabinet' || plan === 'pro'
+  const isEssentielPlus = plan !== 'basique'
 
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [currentConvId, setCurrentConvId] = useState<string | null>(null)

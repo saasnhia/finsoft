@@ -28,7 +28,7 @@ export function UserCountBadge() {
             active: data.active ?? 0,
             limit: data.limit === Infinity ? null : (data.limit ?? null),
             limitLabel: data.limitLabel ?? '∞',
-            plan: data.plan ?? 'solo',
+            plan: data.plan ?? 'basique',
           })
         }
       } catch { /* silent */ }

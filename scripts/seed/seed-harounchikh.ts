@@ -90,24 +90,40 @@ async function cleanData(userId: string) {
 // ─── Step 3: Update profile ─────────────────────────────────────────────────
 
 async function updateProfile(userId: string) {
-  log('\n👤 Étape 3 — Mise à jour profil Cabinet...')
+  log('\n👤 Étape 3 — Mise à jour profil Pro (max)...')
   const { error } = await supabase
     .from('user_profiles')
     .upsert({
       id: userId,
-      plan: 'cabinet',
+      plan: 'cabinet_premium',
       profile_type: 'cabinet',
       onboarding_completed: true,
       subscription_status: 'active',
+      subscription_end_date: new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toISOString(),
       factures_limit: 999999,
-      max_users: 10,
+      max_users: 999,
     }, { onConflict: 'id' })
 
   if (error) {
     err(`user_profiles: ${error.message}`)
   } else {
-    log('  ✅ Plan cabinet + subscription active')
+    log('  ✅ Plan pro (max) + subscription active 10 ans')
   }
+
+  // Also upsert into subscriptions table
+  const { error: subErr } = await supabase
+    .from('subscriptions')
+    .upsert({
+      user_id: userId,
+      stripe_customer_id: 'cus_admin_harounchikh',
+      stripe_subscription_id: 'sub_admin_harounchikh',
+      plan: 'cabinet_premium',
+      status: 'active',
+      current_period_end: new Date(Date.now() + 10 * 365 * 24 * 60 * 60 * 1000).toISOString(),
+    }, { onConflict: 'user_id' })
+
+  if (subErr) log(`  ⚠ subscriptions: ${subErr.message}`)
+  else log('  ✅ Subscription Stripe fictive créée')
 }
 
 // ─── Step 4: Insert demo data ────────────────────────────────────────────────

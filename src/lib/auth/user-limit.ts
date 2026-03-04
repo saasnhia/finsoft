@@ -2,13 +2,15 @@ import type { Plan } from './check-plan'
 
 /**
  * Returns the maximum number of concurrent sessions allowed for a plan.
- * null = unlimited (Pro).
+ * null = unlimited (Premium / Cabinet Premium).
  */
 export function getUserLimit(plan: Plan): number | null {
   switch (plan) {
-    case 'starter': return 1
-    case 'cabinet': return 10
-    case 'pro':     return null
+    case 'basique':           return 1
+    case 'essentiel':         return 5
+    case 'premium':           return null
+    case 'cabinet_essentiel': return 10
+    case 'cabinet_premium':   return null
   }
 }
 
@@ -28,8 +30,9 @@ export function isAtLimit(plan: Plan, activeCount: number): boolean {
 /** Upgrade price hint for upsell banners */
 export function getUpgradePrice(plan: Plan): string | null {
   switch (plan) {
-    case 'starter': return '99€/mois (Cabinet Essentiel, 10 utilisateurs)'
-    case 'cabinet': return '179€/mois (Cabinet Premium, 10 utilisateurs)'
-    default:        return null
+    case 'basique':           return '22€/mois (Essentiel, rapprochement IA)'
+    case 'essentiel':         return '74€/mois (Premium, agents IA illimités)'
+    case 'cabinet_essentiel': return '179€/mois (Cabinet Premium, agents IA + liasses)'
+    default:                  return null
   }
 }

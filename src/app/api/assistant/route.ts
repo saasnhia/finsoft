@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
       .select('plan')
       .eq('id', user.id)
       .single()
-    const plan = (profile?.plan as string) ?? 'starter'
+    const plan = (profile?.plan as string) ?? 'basique'
     const model = getModelForPlan(plan)
 
     // Pre-check quota (estimate ~500 tokens for request)

@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     .eq('id', user.id)
     .single()
 
-  const plan = (profile?.plan ?? 'solo') as Plan
+  const plan = (profile?.plan ?? 'basique') as Plan
   const limit = getUserLimit(plan)
 
   // Check if our session already exists (returning ping)
@@ -110,7 +110,7 @@ export async function GET() {
     .eq('id', user.id)
     .single()
 
-  const plan = (profile?.plan ?? 'solo') as Plan
+  const plan = (profile?.plan ?? 'basique') as Plan
   const limit = getUserLimit(plan)
 
   const { count } = await supabase

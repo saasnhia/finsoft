@@ -208,7 +208,7 @@ export default function NotesDefraisPage() {
   const totalTTC = filteredNotes.reduce((s, n) => s + n.montant_ttc, 0)
   const totalTVA = filteredNotes.reduce((s, n) => s + n.tva_recuperable, 0)
 
-  const isEssentielPlus = plan === 'cabinet' || plan === 'pro'
+  const isEssentielPlus = plan !== 'basique'
 
   if (planLoading) return null
 

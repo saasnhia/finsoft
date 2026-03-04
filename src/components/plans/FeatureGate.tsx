@@ -23,7 +23,7 @@ interface FeatureGateProps {
  * - If not → shows a lock overlay with an upgrade CTA.
  *
  * Usage:
- *   <FeatureGate feature="categorization_rules" requiredPlan="cabinet">
+ *   <FeatureGate feature="categorization_rules" requiredPlan="essentiel">
  *     <RulesTable />
  *   </FeatureGate>
  */

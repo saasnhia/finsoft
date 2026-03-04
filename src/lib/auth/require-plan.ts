@@ -31,7 +31,7 @@ export async function requirePlanFeature(
     .eq('id', user.id)
     .single()
 
-  const plan = (profile?.plan as Plan) || 'starter'
+  const plan = (profile?.plan as Plan) || 'basique'
 
   if (!hasFeature(plan, feature)) {
     const required = getRequiredPlan(feature)
