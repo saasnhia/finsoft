@@ -76,7 +76,7 @@ export default async function PortailClientPublicPage({ params }: Props) {
               <span className="text-xl">📎</span>
             </div>
             <p className="text-sm font-medium text-gray-700 mb-1">Glissez vos fichiers ici</p>
-            <p className="text-xs text-gray-400">PDF, images, Excel — 10 Mo max par fichier</p>
+            <p className="text-xs text-gray-400">PDF, images, Excel — 50 Mo max par fichier</p>
             <p className="text-xs text-emerald-600 font-medium mt-2">ou cliquez pour sélectionner</p>
           </div>
 

@@ -444,10 +444,10 @@ export async function POST(req: NextRequest) {
       ? (ext as 'jpg' | 'jpeg' | 'png')
       : ext; // xlsx, xls, doc, docx, csv, txt, etc.
 
-    // Check file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
+    // Check file size (50MB limit)
+    if (file.size > 50 * 1024 * 1024) {
       return NextResponse.json({
-        error: 'Fichier trop volumineux. Taille maximale : 10 Mo.'
+        error: 'Fichier trop volumineux. Taille maximale : 50 Mo.'
       }, { status: 400 });
     }
 

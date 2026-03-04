@@ -16,6 +16,7 @@ import {
   BookOpen,
   Plus,
   Send,
+  Info,
   Loader2,
 } from 'lucide-react'
 import { AuditAgent } from '@/components/ai/AuditAgent'
@@ -362,6 +363,12 @@ export default function IAPage() {
             <div className="flex items-center gap-3 flex-wrap">
               <Sparkles className="w-6 h-6 text-emerald-500" />
               <h1 className="text-2xl font-bold text-gray-900">Assistant IA FinSoft</h1>
+              <span className="relative group">
+                <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                <span className="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-64 px-3 py-2 rounded-lg bg-gray-900 text-white text-xs leading-relaxed opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 shadow-lg">
+                  10 analyses / heure en période de lancement. Cette limite sera augmentée prochainement.
+                </span>
+              </span>
               <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-medium">
                 <Lock className="w-3 h-3" />
                 Données anonymisées
@@ -408,12 +415,6 @@ export default function IAPage() {
                     Hébergement : <strong>Mistral AI (France)</strong>.
                   </p>
                 </div>
-              </div>
-
-              {/* Limite taux */}
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-gray-200 text-sm text-gray-500">
-                <Sparkles className="w-3.5 h-3.5 text-gray-400" />
-                Limite : 10 analyses par heure et par compte.
               </div>
 
               {/* Agent cards */}

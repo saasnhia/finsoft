@@ -6,7 +6,7 @@ import { Card, Button, Input } from '@/components/ui'
 import {
   FolderOpen, Plus, Search, AlertTriangle, CheckCircle,
   Clock, Euro, ArrowRightLeft, X, Building2, ChevronRight,
-  Filter, TrendingUp,
+  Filter, TrendingUp, Settings,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useDossier } from '@/contexts/DossierContext'
@@ -296,15 +296,23 @@ export default function CabinetPage() {
 
                     {/* Status badges */}
                     <div className="space-y-2 mb-4">
-                      <div className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg ${tvaConfig.color}`}>
-                        <TVAIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                        {tvaConfig.label}
-                        {d.statuts?.tva_prochaine_echeance && tvaStatus !== 'ok' && (
-                          <span className="ml-auto opacity-70">
-                            Échéance {new Date(d.statuts.tva_prochaine_echeance).toLocaleDateString('fr-FR')}
-                          </span>
-                        )}
-                      </div>
+                      {tvaStatus === 'inconnu' ? (
+                        <Link href="/settings#entreprise"
+                          className="flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors">
+                          <Settings className="w-3.5 h-3.5 flex-shrink-0" />
+                          Régime TVA non défini &rarr; Configurer
+                        </Link>
+                      ) : (
+                        <div className={`flex items-center gap-1.5 text-xs px-2 py-1 rounded-lg ${tvaConfig.color}`}>
+                          <TVAIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                          {tvaConfig.label}
+                          {d.statuts?.tva_prochaine_echeance && tvaStatus !== 'ok' && (
+                            <span className="ml-auto opacity-70">
+                              Échéance {new Date(d.statuts.tva_prochaine_echeance).toLocaleDateString('fr-FR')}
+                            </span>
+                          )}
+                        </div>
+                      )}
 
                       <div className="flex items-center gap-4 text-xs text-navy-500">
                         <span className="flex items-center gap-1">

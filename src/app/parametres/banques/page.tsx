@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, Button, Input } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
 import { useBankAccounts } from '@/hooks/useBankAccounts'
-import { Plus, Trash2, Building2, CreditCard, CheckCircle, XCircle } from 'lucide-react'
+import { Plus, Trash2, Building2, CreditCard, CheckCircle, XCircle, Eye, EyeOff } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import type { BankAccount } from '@/types'
 
@@ -82,6 +82,18 @@ export default function BankAccountsPage() {
 
   const formatIBAN = (iban: string) => {
     return iban.match(/.{1,4}/g)?.join(' ') || iban
+  }
+
+  const maskIban = (iban: string) => {
+    if (!iban || iban.length < 8) return iban
+    const clean = iban.replace(/\s/g, '')
+    return clean.slice(0, 4) + ' \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 \u2022\u2022\u2022\u2022 ' + clean.slice(-4)
+  }
+
+  const [visibleIbans, setVisibleIbans] = useState<Record<string, boolean>>({})
+
+  const toggleIbanVisibility = (accountId: string) => {
+    setVisibleIbans(prev => ({ ...prev, [accountId]: !prev[accountId] }))
   }
 
   const getAccountTypeLabel = (type: string) => {
@@ -172,9 +184,18 @@ export default function BankAccountsPage() {
               <div className="space-y-3">
                 <div>
                   <p className="text-xs text-navy-500 mb-1">IBAN</p>
-                  <p className="text-sm font-mono text-navy-900">
-                    {formatIBAN(account.iban)}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-mono text-navy-900">
+                      {visibleIbans[account.id] ? formatIBAN(account.iban) : maskIban(account.iban)}
+                    </p>
+                    <button
+                      onClick={() => toggleIbanVisibility(account.id)}
+                      className="p-1 text-navy-400 hover:text-navy-700 transition-colors"
+                      title={visibleIbans[account.id] ? 'Masquer' : 'Afficher'}
+                    >
+                      {visibleIbans[account.id] ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                    </button>
+                  </div>
                 </div>
 
                 {account.bic && (

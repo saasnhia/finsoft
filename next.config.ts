@@ -30,7 +30,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      bodySizeLimit: '2mb',
+      bodySizeLimit: '50mb',
     },
     serverComponentsExternalPackages: ['tesseract.js'],
   },

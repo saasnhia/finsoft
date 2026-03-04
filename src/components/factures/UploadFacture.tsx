@@ -20,9 +20,9 @@ export function UploadFacture({ onUploadSuccess }: UploadFactureProps) {
 
   // File upload handler
   const handleFile = async (file: File) => {
-    // Validate file size (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Fichier trop volumineux (max 10 Mo).')
+    // Validate file size (50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('Fichier trop volumineux (max 50 Mo).')
       return
     }
 
@@ -151,7 +151,7 @@ export function UploadFacture({ onUploadSuccess }: UploadFactureProps) {
                     Glissez-déposez ou cliquez pour importer
                   </p>
                   <p className="text-sm text-navy-500 mt-1">
-                    PDF, Excel, Word, Images, CSV, TXT (max 10 Mo)
+                    PDF, Excel, Word, Images, CSV, TXT (max 50 Mo)
                   </p>
                 </div>
               </>

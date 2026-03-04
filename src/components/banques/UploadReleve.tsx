@@ -21,9 +21,9 @@ export function UploadReleve({ bankAccounts, onImportSuccess }: UploadReleveProp
 
   // File upload handler
   const handleFile = async (file: File) => {
-    // Validate file size (10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      toast.error('Fichier trop volumineux (max 10 Mo).')
+    // Validate file size (50MB)
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error('Fichier trop volumineux (max 50 Mo).')
       return
     }
 
@@ -182,7 +182,7 @@ export function UploadReleve({ bankAccounts, onImportSuccess }: UploadReleveProp
                   <p className="font-medium text-navy-900">
                     Glissez-déposez ou cliquez pour importer
                   </p>
-                  <p className="text-sm text-navy-500 mt-1">CSV, PDF, Excel, TXT (max 10 Mo)</p>
+                  <p className="text-sm text-navy-500 mt-1">PDF, Excel, CSV — jusqu&apos;à 50 Mo</p>
                 </div>
               </>
             )}

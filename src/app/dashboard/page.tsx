@@ -149,9 +149,27 @@ interface KPICardProps {
   accent: string
   variant: 'default' | 'danger' | 'warning' | 'success'
   loading?: boolean
+  sparklineData?: number[]
+  sparklineColor?: string
 }
 
-function SimpleKPICard({ title, value, subtitle, icon, accent, variant, loading }: KPICardProps) {
+// ─── Mini sparkline SVG ─────────────────────────────────────────────────────
+
+function SparkLine({ data, color = '#22D3A5', height = 40 }: { data: number[]; color?: string; height?: number }) {
+  if (data.length < 2) return null
+  const min = Math.min(...data)
+  const max = Math.max(...data)
+  const range = max - min || 1
+  const w = 100
+  const points = data.map((v, i) => `${(i / (data.length - 1)) * w},${height - ((v - min) / range) * (height - 4) - 2}`).join(' ')
+  return (
+    <svg viewBox={`0 0 ${w} ${height}`} className="w-full" style={{ height }} preserveAspectRatio="none">
+      <polyline fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={points} />
+    </svg>
+  )
+}
+
+function SimpleKPICard({ title, value, subtitle, icon, accent, variant, loading, sparklineData, sparklineColor }: KPICardProps) {
   const variantBg: Record<string, string> = {
     default: 'bg-white',
     danger: 'bg-red-50',
@@ -182,6 +200,12 @@ function SimpleKPICard({ title, value, subtitle, icon, accent, variant, loading 
           {icon}
         </div>
       </div>
+      {/* TODO: brancher les vraies données historiques (7 derniers jours) */}
+      {sparklineData && sparklineData.length > 1 && (
+        <div className="mt-3 -mx-1">
+          <SparkLine data={sparklineData} color={sparklineColor} height={40} />
+        </div>
+      )}
     </div>
   )
 }
@@ -632,6 +656,8 @@ if (!authLoading && initialized && user && !isActive) {
                 accent="bg-blue-500"
                 variant="default"
                 loading={loading}
+                sparklineData={[42, 45, 40, 48, 52, 47, 50]}
+                sparklineColor="#3b82f6"
               />
               <SimpleKPICard
                 title="Retard clients"
@@ -641,6 +667,8 @@ if (!authLoading && initialized && user && !isActive) {
                 accent="bg-red-500"
                 variant={kpis && kpis.count_en_retard > 0 ? 'danger' : 'default'}
                 loading={loading}
+                sparklineData={[18, 22, 20, 25, 19, 21, 17]}
+                sparklineColor="#ef4444"
               />
               <SimpleKPICard
                 title="DSO (jours)"
@@ -652,6 +680,8 @@ if (!authLoading && initialized && user && !isActive) {
                 accent="bg-amber-500"
                 variant="default"
                 loading={loading || extraLoading}
+                sparklineData={[35, 33, 37, 34, 31, 32, 30]}
+                sparklineColor="#f59e0b"
               />
               <SimpleKPICard
                 title="Taux retard"
@@ -665,6 +695,8 @@ if (!authLoading && initialized && user && !isActive) {
                 accent={kpis != null && kpis.encours_clients > 0 && (kpis.total_en_retard / kpis.encours_clients) > 0.2 ? 'bg-red-500' : 'bg-emerald-500'}
                 variant={kpis != null && kpis.encours_clients > 0 && (kpis.total_en_retard / kpis.encours_clients) > 0.2 ? 'danger' : 'success'}
                 loading={loading}
+                sparklineData={[15, 18, 14, 16, 12, 13, 11]}
+                sparklineColor="#22D3A5"
               />
             </div>
           </div>

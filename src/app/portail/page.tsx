@@ -6,7 +6,7 @@ import { AppShell } from '@/components/layout'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { Plus, FileText, MessageSquare, ExternalLink, Loader2, X } from 'lucide-react'
+import { Plus, FileText, ExternalLink, Loader2, X, Copy, Mail, Link2, Check } from 'lucide-react'
 
 interface PortailEntry {
   id: string
@@ -26,10 +26,12 @@ export default function PortailDashboard() {
   const [portails, setPortails] = useState<PortailEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [showInvite, setShowInvite] = useState(false)
+  const [inviteMode, setInviteMode] = useState<'email' | 'link'>('email')
   const [invitEmail, setInvitEmail] = useState('')
   const [invitNom, setInvitNom] = useState('')
   const [inviting, setInviting] = useState(false)
   const [inviteSuccess, setInviteSuccess] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
 
   const fetchPortails = async () => {
     setLoading(true)
@@ -44,13 +46,18 @@ export default function PortailDashboard() {
   useEffect(() => { void fetchPortails() }, [])
 
   const handleInvite = async () => {
-    if (!invitEmail.trim() || !invitNom.trim()) return
+    if (!invitNom.trim()) return
+    if (inviteMode === 'email' && !invitEmail.trim()) return
     setInviting(true)
     try {
       const res = await fetch('/api/portail/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ client_email: invitEmail, client_nom: invitNom }),
+        body: JSON.stringify({
+          client_email: inviteMode === 'email' ? invitEmail : `portail+${Date.now()}@finpilote.app`,
+          client_nom: invitNom,
+          skip_email: inviteMode === 'link',
+        }),
       })
       const data = await res.json()
       if (data.success) {
@@ -78,31 +85,79 @@ export default function PortailDashboard() {
           </Button>
         </div>
 
-        {/* Invite modal */}
+        {/* Invite modal — unified: email invitation + public link */}
         {showInvite && (
           <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <Card className="w-full max-w-md relative">
-              <button onClick={() => { setShowInvite(false); setInviteSuccess(null) }}
+              <button onClick={() => { setShowInvite(false); setInviteSuccess(null); setCopied(false) }}
                 className="absolute top-4 right-4 text-navy-400 hover:text-navy-700">
                 <X className="w-5 h-5" />
               </button>
-              <h2 className="text-lg font-semibold text-navy-900 mb-4">Inviter un client</h2>
+              <h2 className="text-lg font-semibold text-navy-900 mb-1">Inviter un client</h2>
+              <p className="text-xs text-navy-500 mb-4">Espace collaboratif sécurisé</p>
+
               {inviteSuccess ? (
                 <div className="space-y-3">
                   <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-                    <p className="text-sm text-emerald-800 font-medium">Invitation envoyée !</p>
+                    <p className="text-sm text-emerald-800 font-medium">
+                      {inviteMode === 'email' ? 'Invitation envoyée !' : 'Portail créé !'}
+                    </p>
                     <p className="text-xs text-emerald-600 mt-1">Lien portail :</p>
-                    <p className="text-xs font-mono text-emerald-700 mt-1 break-all">{inviteSuccess}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <p className="text-xs font-mono text-emerald-700 break-all flex-1">{inviteSuccess}</p>
+                      <button
+                        onClick={() => { void navigator.clipboard.writeText(inviteSuccess); setCopied(true) }}
+                        className="p-1.5 text-emerald-600 hover:bg-emerald-100 rounded transition-colors flex-shrink-0"
+                        title="Copier le lien"
+                      >
+                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
-                  <Button onClick={() => setShowInvite(false)}>Fermer</Button>
+                  <Button onClick={() => { setShowInvite(false); setInviteSuccess(null); setCopied(false) }}>Fermer</Button>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
+                  {/* Mode toggle */}
+                  <div className="flex gap-1 p-1 bg-navy-50 rounded-xl">
+                    <button
+                      onClick={() => setInviteMode('email')}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                        inviteMode === 'email' ? 'bg-white text-navy-900 shadow-sm' : 'text-navy-500 hover:text-navy-700'
+                      }`}
+                    >
+                      <Mail className="w-4 h-4" />
+                      Invitation email
+                    </button>
+                    <button
+                      onClick={() => setInviteMode('link')}
+                      className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
+                        inviteMode === 'link' ? 'bg-white text-navy-900 shadow-sm' : 'text-navy-500 hover:text-navy-700'
+                      }`}
+                    >
+                      <Link2 className="w-4 h-4" />
+                      Lien public
+                    </button>
+                  </div>
+
                   <Input label="Nom du client" value={invitNom} onChange={e => setInvitNom(e.target.value)} placeholder="SARL Dupont" />
-                  <Input label="Email du client" type="email" value={invitEmail} onChange={e => setInvitEmail(e.target.value)} placeholder="contact@dupont.fr" />
-                  <Button onClick={() => void handleInvite()} loading={inviting} disabled={!invitEmail.trim() || !invitNom.trim()}>
-                    Envoyer l&apos;invitation
-                  </Button>
+
+                  {inviteMode === 'email' ? (
+                    <>
+                      <Input label="Email du client" type="email" value={invitEmail} onChange={e => setInvitEmail(e.target.value)} placeholder="contact@dupont.fr" />
+                      <p className="text-xs text-navy-400">Votre client recevra un email avec accès à son espace personnel.</p>
+                      <Button onClick={() => void handleInvite()} loading={inviting} disabled={!invitEmail.trim() || !invitNom.trim()}>
+                        Envoyer l&apos;invitation
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs text-navy-400">Partagez ce lien avec votre client pour qu&apos;il accède à son espace document.</p>
+                      <Button onClick={() => void handleInvite()} loading={inviting} disabled={!invitNom.trim()}>
+                        Générer le lien
+                      </Button>
+                    </>
+                  )}
                 </div>
               )}
             </Card>

@@ -7,19 +7,11 @@ import { Input } from '@/components/ui/Input'
 import { Card } from '@/components/ui/Card'
 import { ChevronRight, ChevronLeft, Send, Save, RotateCcw } from 'lucide-react'
 
-const EMOJIS = [
-  '🤖','🧠','⚖️','📊','💼','🔍','📋','🏛️','💰','📈',
-  '🎯','⚙️','🛡️','📝','🔑','💡','🌐','📌','🔔','✅',
-  '📣','🗂️','💹','🏗️','🚗','🏥','🍽️','🏠','🛒','🎓',
-]
-
-const COULEURS = [
-  { label: 'Indigo', value: '#6366f1' },
-  { label: 'Vert', value: '#22D3A5' },
-  { label: 'Bleu', value: '#3b82f6' },
-  { label: 'Violet', value: '#8b5cf6' },
-  { label: 'Corail', value: '#f43f5e' },
-  { label: 'Ambre', value: '#f59e0b' },
+const TYPES_AGENT: { label: string; value: string; emoji: string; couleur: string }[] = [
+  { label: 'Comptabilité', value: 'comptabilite', emoji: '\u{1F4CA}', couleur: '#22D3A5' },
+  { label: 'Fiscal', value: 'fiscal', emoji: '\u{1F4CB}', couleur: '#6366f1' },
+  { label: 'Audit', value: 'audit', emoji: '\u{1F50D}', couleur: '#3b82f6' },
+  { label: 'Autre', value: 'autre', emoji: '\u{1F916}', couleur: '#8b5cf6' },
 ]
 
 const SECTEURS = ['BTP', 'Immobilier', 'Restauration', 'Transport', 'Santé', 'Retail', 'Informatique', 'Autre']
@@ -79,8 +71,15 @@ export function AgentCreatorWizard({ mode = 'create', agentId, initialData }: Pr
   // Step 1
   const [nom, setNom] = useState(initialData?.nom ?? '')
   const [description, setDescription] = useState(initialData?.description ?? '')
-  const [emoji, setEmoji] = useState(initialData?.avatar_emoji ?? '🤖')
-  const [couleur, setCouleur] = useState(initialData?.couleur ?? '#6366f1')
+  const [typeAgent, setTypeAgent] = useState(() => {
+    if (initialData?.avatar_emoji) {
+      const found = TYPES_AGENT.find(t => t.emoji === initialData.avatar_emoji)
+      return found?.value ?? 'autre'
+    }
+    return 'autre'
+  })
+  const emoji = TYPES_AGENT.find(t => t.value === typeAgent)?.emoji ?? '\u{1F916}'
+  const couleur = TYPES_AGENT.find(t => t.value === typeAgent)?.couleur ?? '#8b5cf6'
   const [secteur, setSecteur] = useState(initialData?.secteur_metier ?? '')
 
   // Step 2
@@ -223,24 +222,18 @@ export function AgentCreatorWizard({ mode = 'create', agentId, initialData }: Pr
           <Input label="Description courte" value={description} onChange={e => setDescription(e.target.value)} placeholder="Ce que fait cet agent..." />
 
           <div>
-            <label className="block text-sm font-medium text-navy-700 mb-2">Avatar</label>
-            <div className="grid grid-cols-10 gap-1">
-              {EMOJIS.map(e => (
-                <button key={e} onClick={() => setEmoji(e)}
-                  className={`w-9 h-9 rounded-lg text-xl flex items-center justify-center transition-colors ${emoji === e ? 'bg-emerald-100 ring-2 ring-emerald-500' : 'hover:bg-navy-50'}`}>
-                  {e}
+            <label className="block text-sm font-medium text-navy-700 mb-2">Type d&apos;agent</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {TYPES_AGENT.map(t => (
+                <button key={t.value} onClick={() => setTypeAgent(t.value)}
+                  className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-colors border ${
+                    typeAgent === t.value
+                      ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
+                      : 'border-navy-200 text-navy-700 hover:border-navy-300'
+                  }`}>
+                  <span className="text-lg">{t.emoji}</span>
+                  {t.label}
                 </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-navy-700 mb-2">Couleur</label>
-            <div className="flex gap-2">
-              {COULEURS.map(c => (
-                <button key={c.value} onClick={() => setCouleur(c.value)}
-                  className={`w-8 h-8 rounded-full transition-transform ${couleur === c.value ? 'scale-125 ring-2 ring-offset-2 ring-navy-400' : ''}`}
-                  style={{ backgroundColor: c.value }} title={c.label} />
               ))}
             </div>
           </div>

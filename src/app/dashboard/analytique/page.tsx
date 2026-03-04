@@ -176,7 +176,8 @@ export default function AnalytiquePage() {
     URL.revokeObjectURL(url)
   }
 
-  const isPremium = plan === 'pro'
+  const isPremium = plan === 'pro' || plan === 'cabinet'
+  const isTrial = !isPremium // Show trial banner if not on a paid plan that includes this feature
 
   if (planLoading) return null
 
@@ -194,8 +195,13 @@ export default function AnalytiquePage() {
           </button>
         </div>
 
-        {!isPremium && (
-          <PlanRequiredBanner required="Premium" current={plan === 'starter' ? 'Starter' : 'Essentiel'} />
+        {isTrial && (
+          <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-xl mb-6">
+            <AlertCircle className="w-4 h-4 text-blue-500 flex-shrink-0" />
+            <p className="text-sm text-blue-700">
+              Vous testez cette fonctionnalité — disponible sur tous les plans payants.
+            </p>
+          </div>
         )}
 
         <div className="grid lg:grid-cols-3 gap-6">
