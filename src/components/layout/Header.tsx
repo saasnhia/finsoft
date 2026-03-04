@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 import { Button } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
 import { DossierSwitcher } from '@/components/cabinet/DossierSwitcher'
+import { useCommandPalette } from '@/lib/search/use-command-palette'
 import {
   LogOut,
   Menu,
@@ -15,6 +16,7 @@ import {
   User,
   HelpCircle,
   Plus,
+  Search,
   LayoutDashboard,
   Receipt,
   FileText,
@@ -52,6 +54,7 @@ export function Header() {
   const { user, loading, signOut } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const { setOpen: setCommandOpen } = useCommandPalette()
 
   const isTabActive = (tab: typeof headerTabs[number]) => {
     if (Array.isArray(tab.matchPrefix)) {
@@ -114,6 +117,18 @@ export function Header() {
 
           {/* Right side */}
           <div className="flex items-center gap-3">
+            {/* Search button */}
+            {user && (
+              <button
+                onClick={() => setCommandOpen(true)}
+                className="hidden md:flex items-center gap-2 px-3 py-1.5 text-sm text-neutral-400 bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10"
+              >
+                <Search size={14} />
+                <span className="text-xs">Rechercher...</span>
+                <kbd className="ml-1 px-1.5 py-0.5 text-[10px] bg-white/10 border border-white/15 rounded text-neutral-500">⌘K</kbd>
+              </button>
+            )}
+
             {loading ? (
               <div className="w-8 h-8 rounded-full bg-white/10 animate-pulse" />
             ) : user ? (
