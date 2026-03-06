@@ -139,7 +139,7 @@ export default function OnboardingPage() {
         setLoading(false)
         return
       }
-      router.push('/dashboard')
+      router.push('/pricing')
     } catch {
       setError('Erreur réseau, veuillez réessayer')
       setLoading(false)

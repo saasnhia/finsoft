@@ -1,9 +1,13 @@
 /**
  * Fix subscription for harounchikh71@gmail.com
  * - Clean old subscriptions
- * - Apply plan 'pro' (max) with correct column values
+ * - Apply plan 'cabinet_premium' (max) with correct column values
  * Run: npx tsx scripts/seed/fix-subscription.ts
  */
+
+import { config } from 'dotenv'
+import { resolve } from 'path'
+config({ path: resolve(process.cwd(), '.env.local') })
 
 import { createClient } from '@supabase/supabase-js'
 

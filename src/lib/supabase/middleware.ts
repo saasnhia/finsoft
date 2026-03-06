@@ -7,6 +7,7 @@ const PUBLIC_PATHS = [
   '/pricing',
   '/login',
   '/signup',
+  '/forgot-password',
   '/faq',
   '/cgv',
   '/cgu',
@@ -36,10 +37,18 @@ const PUBLIC_PREFIXES = [
 ]
 
 /**
+ * Routes accessibles après auth MAIS sans subscription obligatoire.
+ * - /onboarding : nouvel utilisateur non encore abonné
+ * - /checkout/ : attente confirmation webhook Stripe
+ * - /reset-password : réinitialisation mot de passe (lien email)
+ */
+const SKIP_SUBSCRIPTION_PATHS = ['/onboarding', '/checkout/', '/reset-password']
+
+/**
  * Routes accessibles après auth+subscription MAIS sans onboarding obligatoire.
  * Évite la boucle de redirection /onboarding → /onboarding.
  */
-const SKIP_ONBOARDING_PATHS = ['/onboarding']
+const SKIP_ONBOARDING_PATHS = ['/onboarding', '/checkout/', '/reset-password']
 
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true
@@ -84,7 +93,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // ── 2. Route protégée + session → vérification subscription + onboarding ─
+  // ── 2. Route protégée + session → vérification onboarding + subscription ─
   if (!isPublicRoute(pathname) && user) {
     const bypassCheck = process.env.BYPASS_SUBSCRIPTION_CHECK === 'true'
 
@@ -95,46 +104,68 @@ export async function updateSession(request: NextRequest) {
         .eq('id', user.id)
         .maybeSingle()
 
-      let isActive =
+      // ── 2a. Onboarding non complété → /onboarding ──────────────────────
+      // Vérifié EN PREMIER pour que les nouveaux utilisateurs soient guidés
+      // vers l'onboarding avant de choisir un plan.
+      // Exception : si l'utilisateur a déjà un abonnement actif, on ne le
+      // bloque pas en onboarding (protection contre onboarding_completed=false
+      // désynchronisé en DB) — on corrige silencieusement le flag.
+      const skipOnboarding = SKIP_ONBOARDING_PATHS.some(p => pathname.startsWith(p))
+      const profileSubActive =
         profile?.subscription_status === 'active' ||
         profile?.subscription_status === 'trial'
 
-      // Fallback: si user_profiles.subscription_status est désynchronisé,
-      // vérifier directement la table subscriptions (gère le race condition
-      // webhook + données historiques jamais synchronisées)
-      if (!isActive) {
-        const { data: sub } = await supabase
-          .from('subscriptions')
-          .select('status')
-          .eq('user_id', user.id)
-          .in('status', ['active', 'trialing'])
-          .maybeSingle()
-
-        if (sub) {
-          isActive = true
-          // Auto-sync: corriger user_profiles pour les prochaines requêtes
-          const syncStatus = sub.status === 'trialing' ? 'trial' : 'active'
+      if (!skipOnboarding && profile?.onboarding_completed === false) {
+        if (profileSubActive) {
+          // Auto-fix: marquer onboarding comme complété (fire-and-forget)
           void supabase
             .from('user_profiles')
-            .update({ subscription_status: syncStatus })
+            .update({ onboarding_completed: true })
             .eq('id', user.id)
             .then(() => { /* fire-and-forget */ })
+        } else {
+          const url = request.nextUrl.clone()
+          url.pathname = '/onboarding'
+          return NextResponse.redirect(url)
         }
       }
 
-      if (!isActive) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/pricing'
-        url.searchParams.set('message', 'subscription_required')
-        return NextResponse.redirect(url)
-      }
+      // ── 2b. Subscription inactive → /pricing ───────────────────────────
+      const skipSubscription = SKIP_SUBSCRIPTION_PATHS.some(p => pathname.startsWith(p))
+      if (!skipSubscription) {
+        let isActive =
+          profile?.subscription_status === 'active' ||
+          profile?.subscription_status === 'trial'
 
-      // ── 2b. Onboarding non complété → /onboarding ───────────────────────
-      const skipOnboarding = SKIP_ONBOARDING_PATHS.some(p => pathname.startsWith(p))
-      if (!skipOnboarding && profile?.onboarding_completed === false) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/onboarding'
-        return NextResponse.redirect(url)
+        // Fallback: si user_profiles.subscription_status est désynchronisé,
+        // vérifier directement la table subscriptions (gère le race condition
+        // webhook + données historiques jamais synchronisées)
+        if (!isActive) {
+          const { data: sub } = await supabase
+            .from('subscriptions')
+            .select('status')
+            .eq('user_id', user.id)
+            .in('status', ['active', 'trialing'])
+            .maybeSingle()
+
+          if (sub) {
+            isActive = true
+            // Auto-sync: corriger user_profiles pour les prochaines requêtes
+            const syncStatus = sub.status === 'trialing' ? 'trial' : 'active'
+            void supabase
+              .from('user_profiles')
+              .update({ subscription_status: syncStatus })
+              .eq('id', user.id)
+              .then(() => { /* fire-and-forget */ })
+          }
+        }
+
+        if (!isActive) {
+          const url = request.nextUrl.clone()
+          url.pathname = '/pricing'
+          url.searchParams.set('message', 'subscription_required')
+          return NextResponse.redirect(url)
+        }
       }
     }
   }

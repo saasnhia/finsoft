@@ -14,6 +14,19 @@ export default function PricingPage() {
   const [subscribing, setSubscribing] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // Si l'utilisateur a déjà un abonnement actif → dashboard (anti-boucle)
+  useEffect(() => {
+    if (!user || authLoading) return
+    let cancelled = false
+    fetch('/api/stripe/subscription-status')
+      .then(r => r.json())
+      .then((data: { active?: boolean }) => {
+        if (!cancelled && data.active) router.replace('/dashboard')
+      })
+      .catch(() => { /* ignore */ })
+    return () => { cancelled = true }
+  }, [user, authLoading, router])
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search)
