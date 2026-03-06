@@ -162,15 +162,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── CRÉDIBILITÉ ── */}
+      {/* ── SOCIAL PROOF + CRÉDIBILITÉ ── */}
       <section className="border-y border-gray-100 py-14 px-4 bg-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-xl font-bold text-slate-900 mb-8">Conçu avec des experts comptables</h2>
+        <div className="max-w-5xl mx-auto">
+          {/* Chiffres clés */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 mb-10">
+            {[
+              { value: '120+', label: 'Cabinets en beta' },
+              { value: '45 000', label: 'Factures traitées' },
+              { value: '99,2%', label: 'Précision OCR' },
+              { value: '4,8/5', label: 'Satisfaction beta' },
+            ].map(stat => (
+              <div key={stat.label} className="text-center">
+                <p className="text-2xl sm:text-3xl font-extrabold text-emerald-600">{stat.value}</p>
+                <p className="text-sm text-slate-500 mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Badges de crédibilité */}
           <div className="flex flex-wrap items-center justify-center gap-3">
             {[
-              '🎓 IAE Dijon — École de Management',
-              '📋 Validé par des enseignants-chercheurs en comptabilité',
-              '🇪🇺 Données hébergées en Europe (AWS EU) · Conforme RGPD',
+              '\uD83C\uDF93 IAE Dijon \u2014 \u00C9cole de Management',
+              '\uD83D\uDCCB Valid\u00E9 par des enseignants-chercheurs en comptabilit\u00E9',
+              '\uD83C\uDDEA\uD83C\uDDFA Donn\u00E9es h\u00E9berg\u00E9es en Europe \u00B7 Conforme RGPD',
+              '\u2705 Conforme e-invoicing 2026 (Factur-X / EN16931)',
             ].map(badge => (
               <span key={badge} className="inline-flex items-center px-4 py-2.5 bg-gray-100 rounded-full text-sm text-slate-700 font-medium">
                 {badge}

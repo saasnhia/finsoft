@@ -1,4 +1,4 @@
--- Seed: 3 dossiers de démo cabinet FinSoft
+-- Seed: 3 dossiers de démo cabinet Worthifast
 -- À exécuter dans Supabase SQL Editor une fois la migration 013 faite.
 -- Remplacez :user_id par votre UUID (visible dans Authentication > Users).
 
@@ -12,7 +12,7 @@ BEGIN
   -- Récupère le premier utilisateur existant (adapter si nécessaire)
   SELECT id INTO v_user_id FROM auth.users ORDER BY created_at LIMIT 1;
   IF v_user_id IS NULL THEN
-    RAISE EXCEPTION 'Aucun utilisateur trouvé — connectez-vous d''abord à FinSoft';
+    RAISE EXCEPTION 'Aucun utilisateur trouvé — connectez-vous d''abord à Worthifast';
   END IF;
 
   -- ──────────────────────────────────────────────────────────────────────

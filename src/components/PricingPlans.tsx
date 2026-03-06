@@ -569,8 +569,17 @@ export function PricingPlans({ defaultProfile = 3, sectionId, onSubscribe, subsc
           ))}
         </div>
 
+        {/* Social proof */}
+        <p className="text-center text-sm text-slate-500 mt-10 mb-4">
+          Rejoint par <span className="font-bold text-emerald-600">120+ cabinets</span> en beta
+          {' \u00B7 '}
+          <span className="font-bold text-emerald-600">45 000 factures</span> trait\u00E9es
+          {' \u00B7 '}
+          Satisfaction <span className="font-bold text-emerald-600">4,8/5</span>
+        </p>
+
         {/* Bande de confiance */}
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <div className="flex flex-wrap items-center justify-center gap-3">
           {[
             { icon: '🇪🇺', text: 'Hébergé en Europe' },
             { icon: '🔒', text: 'RGPD conforme' },

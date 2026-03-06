@@ -48,4 +48,4 @@ jobs:
 # Required secrets (configure in GitHub repo Settings → Secrets → Actions):
 #   SUPABASE_SERVICE_ROLE_KEY  — service role key from Supabase project settings
 #   TEST_USER_EMAIL            — test account email (default: test@finsoft.dev)
-#   TEST_USER_PASSWORD         — test account password (default: TestFinSoft2026!)
+#   TEST_USER_PASSWORD         — test account password (default: TestWorthifast2026!)

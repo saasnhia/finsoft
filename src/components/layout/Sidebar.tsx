@@ -18,8 +18,6 @@ import {
   Shield,
   Settings,
   HelpCircle,
-  BookOpen,
-  MessageCircle,
   ChevronDown,
   Sliders,
   Users,
@@ -38,7 +36,6 @@ import {
   Users2,
   ShoppingCart,
   Package,
-  MessageSquare,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { createClient } from '@/lib/supabase/client'
@@ -62,21 +59,14 @@ const sections: SidebarSection[] = [
       { name: 'Import Relevé', href: '/import-releve', icon: Upload },
       { name: 'TVA', href: '/tva', icon: Euro },
       { name: 'Rapprochement', href: '/rapprochement', icon: ArrowRightLeft },
+      { name: 'Notes de frais', href: '/dashboard/notes-de-frais', icon: Receipt },
       { name: 'Immobilisations', href: '/dashboard/immobilisations', icon: Building2 },
       { name: 'Analytique', href: '/dashboard/analytique', icon: PieChart },
       { name: 'Liasses fiscales', href: '/dashboard/liasses', icon: FileText, planTag: 'Premium' },
     ],
   },
   {
-    label: 'IA & Automatisation',
-    icon: Sparkles,
-    items: [
-      { name: 'Agents IA', href: '/dashboard/agents', icon: Bot, planTag: 'Premium' },
-      { name: 'Assistant PCG/BOFIP', href: '/dashboard/assistant', icon: MessageSquare, planTag: 'Essentiel+' },
-    ],
-  },
-  {
-    label: 'Audit',
+    label: 'Audit & Automatisation',
     icon: Shield,
     items: [
       { name: 'Balance âgée', href: '/audit/balance-agee', icon: BarChart3 },
@@ -91,21 +81,8 @@ const sections: SidebarSection[] = [
       { name: 'Documents', href: '/commercial', icon: ShoppingCart },
       { name: 'Catalogue', href: '/commercial/catalogue', icon: Package },
       { name: 'Abonnements', href: '/commercial/abonnements', icon: RefreshCw },
-      { name: 'Imports', href: '/commercial/imports', icon: Upload },
-    ],
-  },
-  {
-    label: 'Finances',
-    icon: Euro,
-    items: [
-      { name: 'Notes de frais', href: '/dashboard/notes-de-frais', icon: Receipt },
-    ],
-  },
-  {
-    label: 'Achats',
-    icon: ShoppingCart,
-    items: [
       { name: 'Demandes d\'achat', href: '/dashboard/achats', icon: ShoppingCart },
+      { name: 'Imports', href: '/commercial/imports', icon: Upload },
     ],
   },
   {
@@ -132,9 +109,7 @@ const sections: SidebarSection[] = [
     label: "Centre d'aide",
     icon: HelpCircle,
     items: [
-      { name: 'FAQ', href: '/faq', icon: HelpCircle },
-      { name: 'Tutoriels', href: '/faq', icon: BookOpen },
-      { name: 'Chatbot', href: '/faq', icon: MessageCircle },
+      { name: 'FAQ & Aide', href: '/faq', icon: HelpCircle },
     ],
   },
 ]

@@ -367,12 +367,11 @@ async function insertData(userId: string) {
       { date: '2026-01-14', description: 'FRAIS BANCAIRES JANVIER', amount: -185, type: 'expense', category: 'other', status: 'reconciled' },
       { date: '2026-01-15', description: 'PRLV ASSURANCE PRO ALLIANZ', amount: -2400, type: 'expense', category: 'insurance', status: 'reconciled' },
       { date: '2026-01-16', description: 'VIR RECU - SCI BELLEVILLE', amount: 15000, type: 'income', category: 'sales', status: 'reconciled' },
-      // 5 unreconciled / pending
-      { date: '2026-01-18', description: 'VIR RECU - INCONNU ENTERPRISE 75', amount: 11000, type: 'income', category: 'other', status: 'active' }, // anomalie > 10k sans justificatif
-      { date: '2026-01-20', description: 'PRLV CARBURANT TOTAL ENERGIE', amount: -3200, type: 'expense', category: 'other', status: 'active' },
-      { date: '2026-01-22', description: 'VIR RECU - SYNDIC PARIS 11', amount: 8900, type: 'income', category: 'sales', status: 'active' },
-      { date: '2026-01-25', description: 'PRLV LOYER ATELIER BAGNOLET', amount: -4500, type: 'expense', category: 'rent', status: 'active' },
-      { date: '2026-01-28', description: 'VIR RECU - HABITATION MODERNE SAS', amount: 19500, type: 'income', category: 'sales', status: 'active' },
+      { date: '2026-01-18', description: 'VIR RECU - INCONNU ENTERPRISE 75', amount: 11000, type: 'income', category: 'other', status: 'reconciled' },
+      { date: '2026-01-20', description: 'PRLV CARBURANT TOTAL ENERGIE', amount: -3200, type: 'expense', category: 'other', status: 'reconciled' },
+      { date: '2026-01-22', description: 'VIR RECU - SYNDIC PARIS 11', amount: 8900, type: 'income', category: 'sales', status: 'reconciled' },
+      { date: '2026-01-25', description: 'PRLV LOYER ATELIER BAGNOLET', amount: -4500, type: 'expense', category: 'rent', status: 'reconciled' },
+      { date: '2026-01-28', description: 'VIR RECU - HABITATION MODERNE SAS', amount: 19500, type: 'income', category: 'sales', status: 'reconciled' },
     ].map(t => ({
       user_id: userId,
       bank_account_id: compteDupont.id,
@@ -398,12 +397,11 @@ async function insertData(userId: string) {
       { date: '2026-01-14', description: 'FRAIS BANCAIRES + CARTE PRO', amount: -240, type: 'expense', category: 'other', status: 'reconciled' },
       { date: '2026-01-15', description: 'PRLV GITHUB ENTERPRISE ANNUEL', amount: -1800, type: 'expense', category: 'subscriptions', status: 'reconciled' },
       { date: '2026-01-17', description: 'VIR RECU - REGION AUVERGNE-RHONE SUB', amount: 7800, type: 'income', category: 'services', status: 'reconciled' },
-      // 5 unreconciled
-      { date: '2026-01-19', description: 'PRLV MICROSOFT 365 BUSINESS', amount: -580, type: 'expense', category: 'subscriptions', status: 'active' },
-      { date: '2026-01-21', description: 'VIR RECU - PME DIGITALE 69', amount: 12500, type: 'income', category: 'services', status: 'active' }, // anomalie > 10k
-      { date: '2026-01-23', description: 'PRLV MUTUELLE MALAKOFF HUMANIS', amount: -920, type: 'expense', category: 'insurance', status: 'active' },
-      { date: '2026-01-25', description: 'VIR RECU - COLLECTIVITE TERRITORIALE', amount: 4800, type: 'income', category: 'services', status: 'active' },
-      { date: '2026-01-28', description: 'PRLV COMPTABLE EXPERTISE SUD-EST', amount: -2200, type: 'expense', category: 'other', status: 'active' },
+      { date: '2026-01-19', description: 'PRLV MICROSOFT 365 BUSINESS', amount: -580, type: 'expense', category: 'subscriptions', status: 'reconciled' },
+      { date: '2026-01-21', description: 'VIR RECU - PME DIGITALE 69', amount: 12500, type: 'income', category: 'services', status: 'reconciled' },
+      { date: '2026-01-23', description: 'PRLV MUTUELLE MALAKOFF HUMANIS', amount: -920, type: 'expense', category: 'insurance', status: 'reconciled' },
+      { date: '2026-01-25', description: 'VIR RECU - COLLECTIVITE TERRITORIALE', amount: 4800, type: 'income', category: 'services', status: 'reconciled' },
+      { date: '2026-01-28', description: 'PRLV COMPTABLE EXPERTISE SUD-EST', amount: -2200, type: 'expense', category: 'other', status: 'reconciled' },
     ].map(t => ({
       user_id: userId,
       bank_account_id: comptetech.id,
@@ -478,8 +476,74 @@ async function insertData(userId: string) {
     }
   }
 
-  // ── 4.6 Alertes (5) ──────────────────────────────────────────────────────
-  log('  4.6 Alertes (5)...')
+  // ── 4.6 Factures fournisseurs OCR (12) ──────────────────────────────────
+  log('  4.6 Factures fournisseurs OCR (12)...')
+
+  const facturesOCR = [
+    { fournisseur: 'BETON MORTAR SAS',         numero: 'BM-2026-0142',  montant_ht: 18500, date: '2026-01-04', statut: 'validee',   confidence: 0.97 },
+    { fournisseur: 'TOTAL ENERGIES',            numero: 'TE-INV-88432',  montant_ht: 3200,  date: '2026-01-06', statut: 'validee',   confidence: 0.95 },
+    { fournisseur: 'ALLIANZ ASSURANCE PRO',     numero: 'ALZ-2026-0019', montant_ht: 2400,  date: '2026-01-08', statut: 'validee',   confidence: 0.99 },
+    { fournisseur: 'LEROY MERLIN PRO',          numero: 'LM-F260112',    montant_ht: 4850,  date: '2026-01-10', statut: 'validee',   confidence: 0.94 },
+    { fournisseur: 'AWS AMAZON WEB SERVICES',   numero: 'INV-FR-67821',  montant_ht: 3200,  date: '2026-01-11', statut: 'validee',   confidence: 0.98 },
+    { fournisseur: 'GITHUB ENTERPRISE',         numero: 'GH-2026-FR-44', montant_ht: 1800,  date: '2026-01-13', statut: 'validee',   confidence: 0.96 },
+    { fournisseur: 'ORANGE BUSINESS SERVICES',  numero: 'OBS-260115-FR', montant_ht: 890,   date: '2026-01-15', statut: 'validee',   confidence: 0.93 },
+    { fournisseur: 'MANPOWER INTERIM',          numero: 'MP-F-2026-228', montant_ht: 7600,  date: '2026-01-17', statut: 'en_attente', confidence: 0.91 },
+    { fournisseur: 'ENGIE PRO GAZ',             numero: 'ENG-260120',    montant_ht: 1450,  date: '2026-01-20', statut: 'en_attente', confidence: 0.88 },
+    { fournisseur: 'KILOUTOU LOCATION',         numero: 'KLT-FAC-9921',  montant_ht: 5200,  date: '2026-01-22', statut: 'en_attente', confidence: 0.92 },
+    { fournisseur: 'BUREAU VALLEE',             numero: 'BV-2026-F-087', montant_ht: 340,   date: '2026-01-25', statut: 'validee',   confidence: 0.97 },
+    { fournisseur: 'AXA PREVOYANCE',            numero: 'AXA-PRO-2026',  montant_ht: 1950,  date: '2026-01-28', statut: 'en_attente', confidence: 0.90 },
+  ].map(f => ({
+    user_id: userId,
+    fournisseur: f.fournisseur,
+    numero_facture: f.numero,
+    montant_ht: f.montant_ht,
+    montant_tva: Math.round(f.montant_ht * 0.20 * 100) / 100,
+    montant_ttc: Math.round(f.montant_ht * 1.20 * 100) / 100,
+    date_facture: f.date,
+    statut: f.statut,
+    ocr_confidence: f.confidence,
+    ocr_raw_text: `Facture ${f.numero} — ${f.fournisseur} — ${f.montant_ht} EUR HT`,
+    fichier_url: `https://storage.worthifast.app/factures/${f.numero.toLowerCase().replace(/[^a-z0-9]/g, '-')}.pdf`,
+  }))
+
+  const { data: ocrData, error: ocrErr } = await supabase
+    .from('factures')
+    .insert(facturesOCR)
+    .select('id')
+
+  if (ocrErr) err(`factures OCR: ${ocrErr.message}`)
+  else log(`    ✓ ${ocrData?.length} factures fournisseurs OCR créées`)
+
+  // ── 4.7 Import history (4) ────────────────────────────────────────────────
+  log('  4.7 Import history (4)...')
+
+  const importHistory = [
+    { file_name: 'releve_BNP_janvier_2026.csv', file_size: 24500, detected_type: 'releve_bancaire', status: 'completed', processed_count: 15, error_count: 0 },
+    { file_name: 'factures_fournisseurs_Q1.pdf', file_size: 1850000, detected_type: 'facture_ocr', status: 'completed', processed_count: 8, error_count: 1 },
+    { file_name: 'FEC_2025_cabinet_moreau.txt', file_size: 456000, detected_type: 'fec_import', status: 'completed', processed_count: 342, error_count: 0 },
+    { file_name: 'factures_batch_janvier.xlsx', file_size: 89000, detected_type: 'excel_batch', status: 'completed', processed_count: 12, error_count: 0 },
+  ].map((h, i) => ({
+    user_id: userId,
+    file_name: h.file_name,
+    file_size: h.file_size,
+    detected_type: h.detected_type,
+    status: h.status,
+    processed_count: h.processed_count,
+    error_count: h.error_count,
+    result_summary: JSON.stringify({ total: h.processed_count + h.error_count, success: h.processed_count, errors: h.error_count }),
+    completed_at: new Date(Date.now() - (4 - i) * 3 * 86400_000).toISOString(),
+  }))
+
+  const { data: impData, error: impErr } = await supabase
+    .from('import_history')
+    .insert(importHistory)
+    .select('id')
+
+  if (impErr) err(`import_history: ${impErr.message}`)
+  else log(`    ✓ ${impData?.length} imports historiques créés`)
+
+  // ── 4.8 Alertes (5) ──────────────────────────────────────────────────────
+  log('  4.8 Alertes (5)...')
 
   const alertsData = [
     {
@@ -551,12 +615,14 @@ async function verify(userId: string) {
   const tables = [
     'clients',
     'factures_clients',
+    'factures',
     'declarations_tva',
     'transactions',
     'rapprochements',
     'comptes_bancaires',
     'alerts',
     'dossiers',
+    'import_history',
   ]
 
   const results: Record<string, number> = {}
@@ -577,11 +643,13 @@ async function verify(userId: string) {
   log('\n📊 Récapitulatif :')
   log(`  clients         : ${results['clients']} (attendu: 8)`)
   log(`  factures_clients: ${results['factures_clients']} (attendu: 40)`)
+  log(`  factures OCR    : ${results['factures']} (attendu: 12)`)
   log(`  declarations_tva: ${results['declarations_tva']} (attendu: 8)`)
   log(`  transactions    : ${results['transactions']} (attendu: ~50)`)
   log(`  rapprochements  : ${results['rapprochements']} (attendu: ~20)`)
   log(`  alertes         : ${results['alerts']} (attendu: 5)`)
   log(`  dossiers        : ${results['dossiers']} (attendu: 1)`)
+  log(`  import_history  : ${results['import_history']} (attendu: 4)`)
 
   return results
 }

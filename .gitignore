@@ -34,6 +34,10 @@ tsconfig.tsbuildinfo
 # MCP_SETUP.md est commitable (pas de secrets)
 .vercel
 
+# Large media assets (dev only)
+public/exports/
+public/screenshots/
+
 # Playwright
 playwright-report/
 test-results/
