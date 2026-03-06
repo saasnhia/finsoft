@@ -18,7 +18,7 @@ import { ComparatifSection } from '@/components/ComparatifSection'
 
 const FAQ_ITEMS: { q: string; r: string; cta?: { text: string; href: string } }[] = [
   { q: 'Worthifast est-il conforme RGPD ?', r: "Oui. Notre infrastructure utilise des serveurs européens certifiés. Aucune donnée n'est transmise à des tiers sans votre consentement. Worthifast est conforme au RGPD et utilise des modèles IA hébergés en Europe." },
-  { q: 'Vous utilisez Sage ou Cegid ?', r: "Worthifast s'intègre avec Sage et Cegid via notre connecteur. Ce qui est repris : FEC, plan comptable personnalisé, balances N-1. Immobilisations : import CSV, migration accompagnée sur demande. Notre équipe vous guide étape par étape.", cta: { text: 'Parler de ma migration \u2192', href: 'mailto:contact@worthifast.app?subject=Migration Sage' } },
+  { q: 'Vous utilisez Sage ou Cegid ?', r: "Les connecteurs Cegid (OAuth2) et Sage (via Chift) sont développés et en cours de déploiement (T2 2026). En attendant, vous pouvez migrer via import FEC. Ce qui est repris : plan comptable personnalisé, balances N-1. Immobilisations : import CSV, migration accompagnée sur demande. Notre équipe vous guide étape par étape.", cta: { text: 'Parler de ma migration \u2192', href: 'mailto:contact@worthifast.app?subject=Migration Sage' } },
   { q: "Comment fonctionne l'essai gratuit ?", r: "Vous créez votre compte sans carte bancaire. Accès complet pendant 30 jours. À l'issue de la période d'essai, l'accès est suspendu sauf souscription à un abonnement payant. Vous pouvez résilier à tout moment en 1 clic depuis vos paramètres." },
   { q: "Qu'est-ce que l'e-invoicing 2026 ?", r: "À partir de 2026, la facturation électronique sera obligatoire entre entreprises françaises. Worthifast vous prépare dès maintenant avec le format Factur-X et le statut d'Opérateur de Dématérialisation." },
   { q: "Puis-je annuler mon abonnement à tout moment ?", r: "Absolument. Pas d'engagement, pas de frais de résiliation. Résiliez en 1 clic depuis vos paramètres. Vous pouvez exporter toutes vos données à tout moment au format standard (FEC, CSV, PDF)." },
@@ -231,11 +231,11 @@ export default function HomePage() {
             Gérez tous vos dossiers depuis une seule plateforme
           </h2>
           <p className="text-slate-400 max-w-xl mx-auto mb-8">
-            Multi-dossiers, portail client, e-invoicing, intégrations Cegid &amp; Sage.
+            Multi-dossiers, portail client, e-invoicing, connecteurs Cegid &amp; Sage (bientôt).
             Worthifast est conçu pour les cabinets qui veulent gagner du temps sur chaque dossier.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-6 mb-10">
-            {['Multi-dossiers illimités', 'Portail client sécurisé', 'E-invoicing 2026 natif', 'Intégration Cegid / Sage'].map(f => (
+            {['Multi-dossiers illimités', 'Portail client sécurisé', 'E-invoicing 2026 natif', 'Cegid & Sage — bientôt'].map(f => (
               <div key={f} className="flex items-center gap-2 text-sm text-slate-300">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 {f}

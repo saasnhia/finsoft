@@ -18,12 +18,13 @@ const ROWS: CompRow[] = [
   { feature: 'E-invoicing 2026 natif (Factur-X EN16931)', worthifast: true, pennylane: 'Partiel' },
   { feature: 'Relances automatiques impayés (J+7/J+15/J+30)', worthifast: true, pennylane: false },
   { feature: 'IA spécialisée PCG, BOFIP et CGI', worthifast: true, pennylane: 'Généraliste' },
-  { feature: 'Connecteurs Sage & Cegid + migration FEC', worthifast: true, pennylane: false },
+  { feature: 'Migration FEC + connecteurs Cegid & Sage (déploiement T2 2026)', worthifast: 'Bientôt', pennylane: false },
   { feature: 'Connexion bancaire Open Banking', worthifast: 'Bientôt', pennylane: true },
   { feature: 'Données hébergées en Europe (RGPD)', worthifast: true, pennylane: true },
 ]
 
 const ROADMAP = [
+  'Connecteurs Cegid (OAuth2) & Sage (Chift) — code prêt, déploiement T2 2026',
   'Connexion bancaire Open Banking — en cours',
   'Lettrage avancé et multi-exercice — prévu T3 2026',
   'Signature électronique portail — sur la roadmap',
