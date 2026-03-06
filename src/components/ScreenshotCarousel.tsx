@@ -21,14 +21,14 @@ const SLIDES = [
     description: 'Import CSV, catégorisation automatique PCG et rapprochement IA en un clic',
   },
   {
-    src: '/screenshots/relances.png',
-    title: 'Relances automatiques impayés',
-    description: 'Suivi des impayés par niveau J+7, J+30, mise en demeure — sans aucune saisie manuelle',
+    src: '/screenshots/dashboard2.png',
+    title: 'Pilotage financier complet',
+    description: 'CA, charges, marge brute, BFR et rapprochement clients — toutes vos données financières en un écran',
   },
   {
-    src: '/screenshots/einvoicing.png',
-    title: 'E-invoicing 2026 natif',
-    description: 'Norme Factur-X, profil EN16931, validation automatique des 16 champs obligatoires DGFiP',
+    src: '/screenshots/screen3.png',
+    title: 'Balance âgée et activité récente',
+    description: 'Suivi fournisseurs, rapprochements validés, import de fichiers et recommandations IA',
   },
 ]
 
@@ -67,17 +67,17 @@ export function ScreenshotCarousel() {
         </div>
 
         {/* Slide content — real screenshot */}
-        <div className="relative aspect-[16/9]">
+        <div className="relative aspect-[16/9] bg-slate-900">
           <Image
             src={slide.src}
             alt={slide.title}
             fill
-            className="object-cover object-top"
+            className="object-contain"
             priority={current === 0}
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
           />
           {/* Overlay gradient for title readability */}
-          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent pt-16 pb-4 px-6">
+          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent pt-20 pb-4 px-6">
             <p className="text-lg font-bold text-white mb-1">{slide.title}</p>
             <p className="text-slate-200 text-sm">{slide.description}</p>
           </div>
